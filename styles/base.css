@@ -45,6 +45,9 @@ body { padding-bottom: var(--safe-bottom); }
 button { -webkit-tap-highlight-color: transparent; }
 
 .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 44px;
   min-width: 44px;
   padding: 10px 14px;
