@@ -229,6 +229,21 @@ button { -webkit-tap-highlight-color: transparent; }
 .toggle-row input:checked::after { transform: translateX(16px); background: var(--text-color); }
 .toggle-row:hover { color: var(--text-color); }
 
+/* ---------- Relay status line (online mode) ---------- */
+
+.relay-status {
+  margin-top: 10px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.03rem;
+  color: var(--dim-text);
+}
+.relay-status[data-state="synced"],
+.relay-status[data-state="listening"] { color: var(--dimmer-text); }
+.relay-status[data-state="offline"] { color: var(--text-color); }
+.relay-status:empty { display: none !important; }
+body[data-phase="setup"] .relay-status { display: none; }
+
 /* ---------- Send-move panel (online mode) ---------- */
 
 .send-panel {

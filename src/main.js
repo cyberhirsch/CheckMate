@@ -3,6 +3,7 @@ import { BoardView } from "./board.js";
 import { GameController } from "./game-controller.js";
 import { HotseatController } from "./hotseat-controller.js";
 import { OnlineController } from "./online-controller.js";
+import { NostrTransport } from "./nostr.js";
 import { wireModeSwitch } from "./mode-controller.js";
 import { renderQR } from "./qr.js";
 import { loadStored, saveStored, clearStored } from "./storage.js";
@@ -37,7 +38,18 @@ const gameController = new GameController({
 
 const hotseat = new HotseatController(gameController);
 
+const transport = new NostrTransport();
+transport.init(); // warm up in the background; controller re-checks availability
+
+const RELAY_STATUS_TEXT = {
+  listening: "Relay sync active — moves arrive automatically",
+  sending: "Sending move to relays…",
+  synced: "Move delivered via relay — link below is a backup",
+  offline: "Relays unreachable — send the link to your opponent",
+};
+
 const online = new OnlineController(gameController, {
+  transport,
   onLinkReady: (link) => {
     el("link-output").value = link;
     el("send-panel").classList.remove("hidden");
@@ -45,6 +57,11 @@ const online = new OnlineController(gameController, {
   },
   onIncomingApplied: () => {
     el("send-panel").classList.add("hidden");
+  },
+  onRelayStatus: (status) => {
+    const line = el("relay-status");
+    line.textContent = RELAY_STATUS_TEXT[status] || "";
+    line.dataset.state = status;
   },
 });
 

@@ -22,12 +22,13 @@ export function moveToken(record) {
   return record.from + record.to + (record.promotion || "");
 }
 
-export function encodeLink({ gameType = "chess", gameId, moves, action }) {
+export function encodeLink({ gameType = "chess", gameId, moves, action, pubkey }) {
   const params = new URLSearchParams();
   if (gameType !== "chess") params.set("t", gameType); // chess is the default, keeps links short
   params.set("g", gameId);
   if (moves.length) params.set("m", moves.join("-"));
   if (action) params.set("a", action);
+  if (pubkey) params.set("p", pubkey); // sender's Nostr pubkey, lets the opener pair for relay sync
   const base = location.origin + location.pathname;
   return `${base}#${params.toString()}`;
 }
@@ -49,7 +50,9 @@ export function parseHash(hash) {
   for (const m of moves) {
     if (!typeDef.moveRe.test(m)) return { ok: false, reason: "bad-move-token" };
   }
-  return { ok: true, gameType, gameId, moves, action };
+  const pubkeyRaw = params.get("p");
+  const pubkey = pubkeyRaw && /^[0-9a-f]{64}$/.test(pubkeyRaw) ? pubkeyRaw : null;
+  return { ok: true, gameType, gameId, moves, action, pubkey };
 }
 
 // Replays a token list through chess.js. Returns { ok, game, records } or { ok:false }.

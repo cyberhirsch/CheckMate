@@ -1,4 +1,4 @@
-const CACHE_NAME = "checkmate-shell-v6";
+const CACHE_NAME = "checkmate-shell-v7";
 const SHELL_FILES = [
   "./",
   "./index.html",
@@ -15,6 +15,7 @@ const SHELL_FILES = [
   "./src/hotseat-controller.js",
   "./src/online-controller.js",
   "./src/link-codec.js",
+  "./src/nostr.js",
   "./src/mode-controller.js",
   "./src/qr.js",
   "./src/storage.js",
