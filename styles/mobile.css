@@ -1,0 +1,17 @@
+@media (max-width: 767px) {
+  .main-area {
+    display: flex;
+    flex-direction: column;
+  }
+  .board-section { order: 1; }
+  .info-panel { order: 2; }
+}
+
+html, body {
+  overflow-x: hidden;
+}
+
+@media (max-width: 380px) {
+  .app-header h1 { font-size: 1.1rem; }
+  .btn { font-size: 0.85rem; padding: 8px 10px; }
+}
