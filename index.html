@@ -4,13 +4,14 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#000000" />
-<title>Checkmate — Chess by Link</title>
+<title>Checkmate — Games by Link</title>
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="styles/base.css" />
 <link rel="stylesheet" href="styles/board.css" />
+<link rel="stylesheet" href="styles/games.css" />
 <link rel="stylesheet" href="styles/mobile.css" />
 <link rel="stylesheet" href="styles/desktop.css" />
 </head>
@@ -39,13 +40,8 @@
         </div>
         <div id="promotion-modal" class="promotion-modal hidden" role="dialog" aria-modal="true" aria-label="Choose promotion piece">
           <div class="promotion-sheet">
-            <h2>Promote to</h2>
-            <div class="promotion-choices">
-              <button type="button" class="btn promo-btn" data-piece="q"><span class="promo-glyph">♛</span>Queen</button>
-              <button type="button" class="btn promo-btn" data-piece="r"><span class="promo-glyph">♜</span>Rook</button>
-              <button type="button" class="btn promo-btn" data-piece="b"><span class="promo-glyph">♝</span>Bishop</button>
-              <button type="button" class="btn promo-btn" data-piece="n"><span class="promo-glyph">♞</span>Knight</button>
-            </div>
+            <h2>Choose</h2>
+            <div class="promotion-choices"></div>
             <button type="button" class="btn" id="promotion-cancel-btn">Cancel</button>
           </div>
         </div>
@@ -67,7 +63,7 @@
 
       <div id="game-controls" class="game-controls">
         <button type="button" id="new-game-btn" class="btn">New Game</button>
-        <button type="button" id="rotate-btn" class="btn hotseat-only">Rotate</button>
+        <button type="button" id="rotate-btn" class="btn hotseat-only rotatable-only">Rotate</button>
         <button type="button" id="undo-btn" class="btn hotseat-only">Undo</button>
         <button type="button" id="resign-btn" class="btn">Resign</button>
         <button type="button" id="draw-btn" class="btn hotseat-only">Draw</button>
@@ -77,11 +73,12 @@
 
     <aside id="info-panel" class="info-panel">
       <div id="setup-panel" class="setup-panel">
+        <div id="game-picker" class="game-picker" role="group" aria-label="Choose a game"></div>
 
         <div id="hotseat-setup" class="setup-block">
           <p class="setup-hint">Two players, one device. Pass it back and forth. Works fully offline.</p>
           <button type="button" id="start-hotseat-btn" class="btn btn-primary btn-lg">Start Game</button>
-          <label class="toggle-row">
+          <label class="toggle-row rotatable-only">
             <input type="checkbox" id="rotate-toggle" />
             <span>Rotate board each turn</span>
           </label>
@@ -92,7 +89,7 @@
         </div>
 
         <div id="online-setup" class="setup-block">
-          <p class="setup-hint">Chess by link — no accounts, no server. Make your move, send the link over any messenger. Your opponent answers whenever they like: the link <em>is</em> the game.</p>
+          <p class="setup-hint">Play by link — no accounts, no server. After a one-time invite link, moves sync automatically through public relays; the link stays available as a fallback for any game, any time.</p>
           <button type="button" id="start-online-btn" class="btn btn-primary btn-lg">New Game<span class="btn-sub">You play White</span></button>
           <p class="setup-hint dim">Received a link? Just open it — the game loads automatically.</p>
         </div>

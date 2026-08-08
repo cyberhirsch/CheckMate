@@ -1,8 +1,8 @@
 # Checkmate — Product Requirements
 
-**Serverless two-player games.** Chess first; a bundle of turn-based games over time. One static web app, two modes: same-device play that works offline, and remote play that needs no server, no account, and — after a one-time pairing link — no leaving the app.
+**Serverless two-player games.** A bundle of turn-based games in one static web app, two modes: same-device play that works offline, and remote play that needs no server, no account, and — after a one-time pairing link — no leaving the app.
 
-*Status: v1 (chess) shipped at [github.com/cyberhirsch/CheckMate](https://github.com/cyberhirsch/CheckMate), live on GitHub Pages.*
+*Status: v2 — 13 games shipped (Tiers 1–3 complete). Repo: [github.com/cyberhirsch/CheckMate](https://github.com/cyberhirsch/CheckMate), live on GitHub Pages.*
 
 ---
 
@@ -62,7 +62,7 @@ Board games between two people should not require infrastructure. No matchmaking
 - **Validation on every remote input:** structural checks, game-ID match, history-extension check against localStorage (fork/staleness detection), full legality replay, and — on the relay path — secp256k1 signature verification and pinned opponent pubkey.
 - **Keys and IDs** from `crypto.getRandomValues()`. Keypair generated locally, stored in localStorage, never leaves the device except as a public key.
 - **PWA:** manifest, service worker with versioned cache (`CACHE_NAME` bump on every deploy — stale caches have bitten us twice), offline hotseat.
-- **Current external dependencies** (esm.sh CDN): chess.js, qrcode, nostr-tools. *Open item: vendor these for full self-containment (also an App Store requirement).*
+- **Dependencies:** chess.js is **vendored** (`src/vendor/chess.js`); the other 12 engines are self-contained with no dependencies. qrcode and nostr-tools still load from esm.sh on demand — *open item: vendor both for full self-containment (also an App Store requirement).*
 
 ## 6. Transport protocol
 
@@ -73,7 +73,7 @@ https://<host>/<path>#t=<game>&g=<gameId>&m=<mv1-mv2-…>&a=<action>&p=<pubkey>
 ```
 
 - `t` game type, omitted for chess (default) · `g` hex game ID (crypto-random)
-- `m` dash-separated move tokens (chess: `e2e4`, promotion `e7e8q`)
+- `m` **dot**-separated move tokens — `.` appears in no token grammar, while `-` does (checkers chains, morris moves). Legacy chess links using `-` still parse.
 - `a` action flag: `res` resign · `do` draw offer · `da` draw accept
 - `p` sender's Nostr pubkey (64-hex), enables relay pairing
 
@@ -92,33 +92,35 @@ Dark monochrome instrument panel (Typegrid system): pure black ground, `#050505�
 
 The shell (modes, transports, persistence, send panel) is game-agnostic; a game contributes a rules engine, a move-token grammar, and a board renderer. Fit criteria: 2-player, turn-based, deterministic, perfect information — extendable with the tricks noted below.
 
-### Tier 1 — perfect fits, build order
+**Engine contract** (`src/games/registry.js` documents it in full): a module exports `meta` (id, title, glyph, player names, `rotatable`, `moveRe`), `createEngine(tokens, {gameId})` returning `null` if any token is illegal, `createView(container)` with `render`/`onTap`, and `tapReducer(engine, selection, cellId)` returning `move` / `select` / `choose` / `none`. Registering a module grants it both modes, link + relay sync, validation, and persistence with no transport code.
 
-| # | Game | Why / notes |
+### Tier 1 — perfect fits ✓ shipped
+
+| # | Game | Token grammar | Notes |
+|---|---|---|---|
+| 1 | **Chess** | `e2e4`, `e7e8q` | vendored chess.js; full rules incl. promotion dialog |
+| 2 | **Connect Four** | `0`–`6` | 1-char tokens, the shortest links in the bundle |
+| 3 | **Reversi / Othello** | `d3` | explicit turn tracking (passes break move parity) |
+| 4 | **Ultimate Tic-Tac-Toe** | `MN` | forced-board rule; decided boards free the move |
+| 5 | **Tic-Tac-Toe** | `0`–`8` | shares the line-winner helper with Ultimate |
+
+### Tier 2 — straightforward fits ✓ shipped
+
+| Game | Token grammar | Notes |
 |---|---|---|
-| 1 | **Chess** | ✓ shipped (v1) |
-| 2 | **Connect Four** | trivial engine, 1-char move tokens, instantly understood by anyone |
-| 3 | **Reversi / Othello** | real strategic depth, dead-simple renderer, short games |
-| 4 | **Ultimate Tic-Tac-Toe** | the 9-board version — novel, genuinely deep, very mobile-friendly |
-| 5 | **Tic-Tac-Toe** | near-free once Ultimate exists; the "explain the app in 5 seconds" game |
+| **Checkers / Draughts** | `c3-d4`, `c3xe5xg7` | mandatory captures, multi-jump chains, kings |
+| **Gomoku** | `h8` | 15×15, five-in-a-row detection from the placed stone |
+| **Hex** | `a1` | 11×11 rhombus, flood-fill connection test, no draws possible |
+| **Nine Men's Morris** | `P0`, `M0-1`, `…X5` | three phases (place/move/fly), mills trigger a removal sub-step |
+| **Dots and Boxes** | `h0,0`, `v0,0` | completing a box grants another turn |
+| **Mancala / Kalah** | `0`–`5` | sowing, extra turn on own store, capture, end-sweep |
+| **Breakthrough** | `a2a3` | diagonal captures only, race to the last rank |
 
-### Tier 2 — straightforward fits
+### Tier 3 — solved randomness ✓ shipped
 
-| Game | Notes |
-|---|---|
-| **Checkers / Draughts** | forced-capture rules need care; otherwise simple |
-| **Gomoku** (five in a row) | 15×15 grid, one move token type |
-| **Hex** (11×11) | elegant, no draws possible; hexagonal renderer is the only work |
-| **Nine Men's Morris** | three phases (place / move / fly) in one small engine |
-| **Dots and Boxes** | extra-turn-on-completed-box rule; edge-based move tokens |
-| **Mancala / Kalah** | deterministic and perfect-information despite the "sowing" feel |
-| **Breakthrough** | pawn-race game, tiny ruleset, fast on mobile |
-
-### Tier 3 — solved randomness (deterministic dice)
-
-| Game | Notes |
-|---|---|
-| **Royal Game of Ur** | dice derived from `hash(gameId + move history)`, weighted 1-4-6-4-1; both clients compute identical rolls, links stay history-only. Mild look-ahead manipulation possible — documented as casual-fair. Oldest known board game; great thematic anchor for the bundle. |
+| Game | Token grammar | Notes |
+|---|---|---|
+| **Royal Game of Ur** | `0`–`14`, `x` (pass) | Dice derived from FNV-1a over `gameId + roll index + history`, 4 binary dice (1-4-6-4-1 weighting). Both clients compute identical rolls — verified across independent engine instances — so links stay history-only. Rosettes grant extra rolls; centre rosette is capture-safe. Mild look-ahead manipulation possible: documented as casual-fair, not tournament-fair. |
 
 ### Tier 4 — bigger boards / end-game negotiation
 
@@ -146,19 +148,21 @@ Hash commitment: publish `sha256(secret + salt)` up front, reveal at game end; c
 | **Card games** (shuffled decks) | same problem plus hidden-hand state; the trust machinery outweighs the game |
 | **Real-time games** | violates the async premise entirely |
 
-**Non-game roadmap:** vendor CDN libs → auto-open share sheet after move (toggle) + auto-copy fallback → game picker on start screen → store wrappers (TWA for Google Play; Capacitor for iOS, $25 one-time / $99-yr fees; all licenses BSD/MIT/Apache, commercial-safe).
+**Non-game roadmap:** vendor remaining CDN libs (qrcode, nostr-tools) → auto-open share sheet after move (toggle) + auto-copy fallback → per-game rules blurb in setup → store wrappers (TWA for Google Play; Capacitor for iOS, $25 one-time / $99-yr fees; all licenses BSD/MIT/Apache, commercial-safe).
 
-## 9. Acceptance criteria (v1 — all currently met)
+## 9. Acceptance criteria (v2 — all currently met)
 
 1. Deploys to static hosting; no backend, DB, or accounts.
 2. Complete legal chess: castling, en passant, promotion (all four pieces), check/checkmate/stalemate, threefold, fifty-move, insufficient material, resignation, draws.
-3. Hotseat: full game on one device; rotation toggle; handoff screen; undo; refresh-restore; works offline.
-4. Online: invite link pairs two devices; afterwards a move made on one appears on the other with no manual sharing (relay path), verified two-directionally.
-5. Link fallback playable end-to-end with relays unreachable.
-6. Tampered, stale, forked, or illegal remote states rejected on both transports.
-7. Board always oriented to the local player in online mode.
-8. No horizontal scroll ≥ 320px width; touch-only interaction; promotion dialog thumb-reachable.
-9. Attribution: commits and published artifacts carry no AI authorship.
+3. All 13 games (Tiers 1–3) playable in both modes with correct win/draw detection.
+4. Hotseat: full game on one device; rotation toggle (rotatable games only); handoff screen; undo; refresh-restore; works offline.
+5. Online: invite link pairs two devices; afterwards a move made on one appears on the other with no manual sharing (relay path), verified two-directionally for chess and Connect Four.
+6. Link fallback playable end-to-end with relays unreachable; token grammars with `-` round-trip correctly.
+7. Tampered, stale, forked, or illegal remote states rejected on both transports.
+8. Board always oriented to the local player in online mode (rotatable games).
+9. Ur dice identical across independent engine instances given the same game ID and history.
+10. No horizontal scroll ≥ 320px width; touch-only interaction; choice dialogs thumb-reachable.
+11. Attribution: commits and published artifacts carry no AI authorship.
 
 ## 10. Risks
 

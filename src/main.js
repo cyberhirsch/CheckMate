@@ -1,5 +1,5 @@
 import { state, setState } from "./state.js";
-import { BoardView } from "./board.js";
+import { BoardHost } from "./board-host.js";
 import { GameController } from "./game-controller.js";
 import { HotseatController } from "./hotseat-controller.js";
 import { OnlineController } from "./online-controller.js";
@@ -7,21 +7,15 @@ import { NostrTransport } from "./nostr.js";
 import { wireModeSwitch } from "./mode-controller.js";
 import { renderQR } from "./qr.js";
 import { loadStored, saveStored, clearStored } from "./storage.js";
-import {
-  el,
-  announce,
-  initReactiveUI,
-  showPromotionModal,
-  renderStatusBar,
-} from "./ui.js";
+import { GAMES, GAME_ORDER, gameModule } from "./games/registry.js";
+import { el, announce, initReactiveUI, renderStatusBar, renderModeUI } from "./ui.js";
 
-const boardEl = el("board");
-const boardView = new BoardView(boardEl, {
-  onMoveAttempt: (attempt) => handleBoardMoveAttempt(attempt),
+const boardHost = new BoardHost(el("board"), {
+  onMoveToken: (token) => gameController.attemptToken(token),
 });
 
 const gameController = new GameController({
-  boardView,
+  boardHost,
   announce,
   onAfterLocalMove: (record) => {
     if (state.mode === "hotseat") {
@@ -30,16 +24,15 @@ const gameController = new GameController({
       online.afterLocalMove(record);
     }
   },
-  onGameOver: (status) => {
+  onGameOver: () => {
     renderStatusBar();
-    announce("Game over: " + status.result);
   },
 });
 
 const hotseat = new HotseatController(gameController);
 
 const transport = new NostrTransport();
-transport.init(); // warm up in the background; controller re-checks availability
+transport.init();
 
 const RELAY_STATUS_TEXT = {
   listening: "Relay sync active — moves arrive automatically",
@@ -65,17 +58,25 @@ const online = new OnlineController(gameController, {
   },
 });
 
-async function handleBoardMoveAttempt(attempt) {
-  if (attempt.needsPromotion) {
-    const piece = await showPromotionModal();
-    if (!piece) {
-      boardView.render();
-      return;
-    }
-    gameController.attemptMove({ from: attempt.from, to: attempt.to, promotion: piece });
-    return;
+// --- Game picker ---
+function buildGamePicker() {
+  const wrap = el("game-picker");
+  wrap.innerHTML = "";
+  for (const id of GAME_ORDER) {
+    const meta = GAMES[id].meta;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "game-card";
+    btn.dataset.game = id;
+    btn.setAttribute("aria-pressed", String(id === state.gameType));
+    btn.innerHTML = `<span class="game-glyph">${meta.glyph}</span><span class="game-name">${meta.title}</span>`;
+    btn.addEventListener("click", () => {
+      if (state.gameType === id) return;
+      setState({ gameType: id });
+      saveStored({ gameType: id });
+    });
+    wrap.appendChild(btn);
   }
-  gameController.attemptMove({ from: attempt.from, to: attempt.to });
 }
 
 // --- Mode switch ---
@@ -111,6 +112,7 @@ el("new-game-btn").addEventListener("click", () => {
     if (!ok) return;
   }
   clearStored();
+  saveStored({ gameType: state.gameType, rotateAfterMove: state.rotateAfterMove, showHandoffScreen: state.showHandoffScreen });
   el("send-panel").classList.add("hidden");
   history.replaceState(null, "", location.pathname);
   setState({ phase: "setup" });
@@ -129,7 +131,10 @@ el("resign-btn").addEventListener("click", () => {
   }
 });
 el("offer-draw-btn").addEventListener("click", () => online.offerDraw());
-el("accept-draw-btn").addEventListener("click", () => online.acceptDraw());
+el("accept-draw-btn").addEventListener("click", () => {
+  if (state.mode === "hotseat") return;
+  online.acceptDraw();
+});
 el("reject-draw-btn").addEventListener("click", () => online.declineDraw());
 
 // --- Share / copy / QR for the move link ---
@@ -176,7 +181,6 @@ el("qr-link-btn").addEventListener("click", async () => {
 function consumeHash() {
   if (!location.hash || location.hash.length < 2) return false;
   const consumed = online.handleIncoming(location.hash, loadStored());
-  // Keep the URL clean either way; the game is persisted to localStorage.
   history.replaceState(null, "", location.pathname);
   return consumed;
 }
@@ -187,6 +191,7 @@ window.addEventListener("hashchange", () => consumeHash());
 function restore() {
   const stored = loadStored();
   if (stored) {
+    if (stored.gameType && GAMES[stored.gameType]) setState({ gameType: stored.gameType });
     if (typeof stored.rotateAfterMove === "boolean") {
       setState({ rotateAfterMove: stored.rotateAfterMove });
       el("rotate-toggle").checked = stored.rotateAfterMove;
@@ -202,21 +207,17 @@ function restore() {
   if (consumeHash()) return;
 
   if (!stored) return;
-  if (stored.mode === "hotseat" && stored.fen && stored.phase === "active") {
+  if (stored.mode === "hotseat" && stored.linkMoves && stored.phase === "active") {
+    const mod = gameModule(stored.gameType || "chess");
+    const engine = mod && mod.createEngine(stored.linkMoves, { gameId: stored.gameId });
+    if (!engine) return;
     setState({
       mode: "hotseat",
       gameId: stored.gameId || "",
       localColor: null,
       connectionState: "not-applicable",
     });
-    gameController.loadFromState(stored.fen, stored.moveHistory || []);
-    setState({
-      fen: stored.fen,
-      moveHistory: stored.moveHistory || [],
-      status: stored.status || { result: "active", winner: null },
-      phase: "active",
-      turn: gameController.game.turn() === "w" ? "white" : "black",
-    });
+    gameController.loadEngine(stored.gameType || "chess", engine, stored.gameId);
     announce("Restored your previous hotseat game");
   } else if (stored.mode === "online" && stored.linkMoves) {
     if (online.restore(stored)) {
@@ -226,10 +227,12 @@ function restore() {
 }
 
 // --- Boot ---
+buildGamePicker();
 initReactiveUI();
 el("rotate-toggle").checked = window.matchMedia("(max-width: 767px)").matches;
 setState({ rotateAfterMove: el("rotate-toggle").checked });
 restore();
+renderModeUI();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {

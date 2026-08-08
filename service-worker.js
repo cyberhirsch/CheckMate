@@ -1,16 +1,17 @@
-const CACHE_NAME = "checkmate-shell-v7";
+const CACHE_NAME = "checkmate-shell-v8";
 const SHELL_FILES = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
   "./styles/base.css",
   "./styles/board.css",
+  "./styles/games.css",
   "./styles/mobile.css",
   "./styles/desktop.css",
   "./src/main.js",
   "./src/state.js",
-  "./src/board.js",
   "./src/ui.js",
+  "./src/board-host.js",
   "./src/game-controller.js",
   "./src/hotseat-controller.js",
   "./src/online-controller.js",
@@ -19,7 +20,22 @@ const SHELL_FILES = [
   "./src/mode-controller.js",
   "./src/qr.js",
   "./src/storage.js",
-  "./src/chess-engine.js",
+  "./src/vendor/chess.js",
+  "./src/games/registry.js",
+  "./src/games/grid-view.js",
+  "./src/games/chess.js",
+  "./src/games/connect4.js",
+  "./src/games/tictactoe.js",
+  "./src/games/ultimate.js",
+  "./src/games/reversi.js",
+  "./src/games/checkers.js",
+  "./src/games/gomoku.js",
+  "./src/games/hex.js",
+  "./src/games/morris.js",
+  "./src/games/dots.js",
+  "./src/games/mancala.js",
+  "./src/games/breakthrough.js",
+  "./src/games/ur.js",
   "./assets/icon.svg",
 ];
 
@@ -41,7 +57,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   const url = new URL(event.request.url);
-  if (url.origin !== self.location.origin) return; // let CDN (chess.js, qr libs) hit network directly
+  if (url.origin !== self.location.origin) return; // CDN (qr, nostr-tools) hits network directly
 
   event.respondWith(
     caches.match(event.request).then((cached) => {

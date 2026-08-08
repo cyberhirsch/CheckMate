@@ -3,6 +3,7 @@ const listeners = new Set();
 export const state = {
   mode: "hotseat",
   phase: "setup",
+  gameType: "chess",
   gameId: "",
   localColor: null,
   fen: null,

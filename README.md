@@ -1,79 +1,100 @@
 # Checkmate — Games by Link
 
-A serverless two-player game app. Chess today, a game bundle tomorrow. Fully static, mobile-first, installable as a PWA.
+A serverless two-player game bundle. **13 turn-based games**, one static web app, no backend, no accounts, no database.
 
-**Play it:** deploy to any static host — no backend, no accounts, no database.
+**Play offline** on one device, or **play online** where moves sync automatically through public relays — with a shareable link as the universal fallback.
+
+## The games
+
+| | Game | | Game |
+|---|---|---|---|
+| ♞ | Chess | ⛃ | Checkers |
+| ◍ | Connect Four | ✻ | Gomoku |
+| ◯ | Tic-Tac-Toe | ⬡ | Hex |
+| ⬚ | Ultimate Tic-Tac-Toe | ◈ | Nine Men's Morris |
+| ◐ | Reversi | ⊞ | Dots & Boxes |
+| ♙ | Breakthrough | ◔ | Mancala |
+| 𒀭 | Royal Game of Ur | | |
+
+Every game supports both modes, full rules validation, move history, undo (hotseat), resignation, and draws.
 
 ## Two modes
 
 ### Hotseat (offline)
-Two players share one device and pass it back and forth. Works fully offline once the app has loaded. Optional board rotation after each turn and a handoff screen to hide the board between moves.
+Two players share one device. Works fully offline once loaded. Optional board rotation after each turn and a handoff screen to hide the board between turns.
 
-### Online (play by link)
-Correspondence-style play with **no server and no live connection**. The entire game travels inside the URL:
+### Online (async, serverless)
+Correspondence play where **neither player needs to be online at the same time**:
 
-```
-https://your-host/checkmate/#g=427cf203a1a9&m=e2e4-e7e5
-```
+1. Start a game, make your move.
+2. Send the invite link once — over any messenger, or as a QR code.
+3. From then on, moves sync **automatically through public [Nostr](https://nostr.com) relays**. Open the app whenever you like; your opponent's moves are waiting.
+4. If relays are unreachable, the move link still carries the entire game — send it and the game continues.
 
-1. Start a game, make your move as White.
-2. Tap **Share** (or Copy / QR) and send the link over any messenger — WhatsApp, SMS, email, anything.
-3. Your opponent opens the link whenever they like. The game loads automatically; they move and send a link back.
-4. Repeat until mate. The link *is* the game.
-
-Neither player ever needs to be online at the same time. The hash fragment never reaches any server, so even the static host sees no game data.
+No server, no accounts, no matchmaking. The relays are free public infrastructure; the link is the fallback that always works.
 
 ## How it stays honest without a server
 
-- Every link carries the **complete move history**, not a diff. Both clients replay the whole game through [chess.js](https://github.com/jhlywa/chess.js) and reject links containing illegal moves.
-- Your copy of each game is kept in `localStorage`. An incoming link must be **your known history extended by legal moves** — stale, forked, or tampered links are detected and ignored.
-- Resignation and draw offers/acceptance travel as flags on the same links.
-- Game IDs come from `crypto.getRandomValues()`.
+- Every link and relay event carries the **complete move history**, not a diff. Both clients replay and validate the whole game locally.
+- Moves published to relays are **cryptographically signed** (secp256k1); your opponent's key is pinned at pairing.
+- Your copy of each game lives in `localStorage`. An incoming state must **extend your known history** — stale, forked, or tampered states are rejected.
+- Game IDs and keys come from `crypto.getRandomValues()`.
+- The Royal Game of Ur derives its dice deterministically from `hash(gameId + move history)`, so both clients compute identical rolls with no extra messages. (Casual-fair — see the PRD for the caveat.)
 
 ## Tech
 
 - Plain ES modules, no build step, no framework.
-- [chess.js](https://github.com/jhlywa/chess.js) for rules: full legality, check/checkmate/stalemate, castling, en passant, promotion, threefold repetition, fifty-move rule, insufficient material.
-- Web Share API / Clipboard API / QR code for sending links, with copy-paste fallbacks.
-- Service worker + web app manifest: installable, offline-capable hotseat.
-- Design: dark monochrome instrument-panel UI — Inter / Outfit / JetBrains Mono, pure black surfaces, hairline borders, no accent color.
+- [chess.js](https://github.com/jhlywa/chess.js) vendored locally; the other 12 engines are self-contained.
+- [nostr-tools](https://github.com/nbd-wtf/nostr-tools) for relay transport, [qrcode](https://github.com/soldair/node-qrcode) for QR links.
+- Service worker + web app manifest: installable, offline-capable.
+- Design: dark monochrome instrument panel — Inter / Outfit / JetBrains Mono, pure black surfaces, hairline borders, no accent color.
+
+## Adding a game
+
+Games plug into a shared shell (modes, transports, persistence, history). A game module exports:
+
+```js
+export const meta = { id, title, glyph, players, rotatable, moveRe };
+export function createEngine(tokens, { gameId }) { … }   // null if any token is illegal
+export function createView(container) { … }              // render + onTap
+export function tapReducer(engine, selection, cellId) { … }  // tap → move | select | choose
+```
+
+Register it in `src/games/registry.js` and it inherits both modes, link/relay sync, validation, and persistence automatically.
 
 ## Run locally
-
-Any static file server works (ES modules don't run from `file://`):
 
 ```bash
 npx http-server -p 8080 -c-1
 ```
 
-Then open `http://localhost:8080`.
+Then open `http://localhost:8080`. (ES modules don't run from `file://`.)
 
 ## Deploy
 
-Push to GitHub Pages, Netlify, Cloudflare Pages, or any static host with HTTPS (needed for the service worker and share/clipboard APIs). Links automatically point at wherever the app is hosted — nothing to configure.
-
-## The bundle
-
-The link protocol is game-agnostic: links carry a game-type field (`t=`, omitted for chess), and each game plugs a rules engine into the shared shell — mode switch, send-move panel, history, persistence. Planned next: Connect Four, Reversi, Ultimate Tic-Tac-Toe. Any 2-player, turn-based, perfect-information game fits.
+Any static host with HTTPS — GitHub Pages, Netlify, Cloudflare Pages. Links automatically point at wherever the app is hosted.
 
 ## Project structure
 
 ```
 index.html              app shell
 manifest.webmanifest    PWA manifest
-service-worker.js       offline cache
-styles/                 base / board / mobile / desktop CSS
+service-worker.js       offline cache (bump CACHE_NAME on deploy)
+PRD.md                  product requirements
+styles/                 base / board / games / mobile / desktop CSS
 src/
   main.js               bootstrap and wiring
   state.js              central app state
-  chess-engine.js       chess.js wrapper
+  board-host.js         mounts the active game's view, tap pipeline
   game-controller.js    shared move pipeline (both modes)
   hotseat-controller.js rotation, handoff, undo
-  online-controller.js  play-by-link mode
+  online-controller.js  link + relay transport
   link-codec.js         URL hash encode / decode / validate
-  board.js              tap-to-move board rendering
-  ui.js                 status bar, history, dialogs
-  mode-controller.js    mode switching
-  storage.js            localStorage persistence
-  qr.js                 QR rendering
+  nostr.js              signed relay transport
+  ui.js, mode-controller.js, storage.js, qr.js
+  vendor/chess.js       vendored dependency
+  games/
+    registry.js         game registration
+    grid-view.js        shared square-grid renderer
+    <13 game modules>
 ```

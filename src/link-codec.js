@@ -1,16 +1,15 @@
 // Encodes a full game into the URL hash and decodes/validates incoming links.
-// Format: #t=<gameType>&g=<gameId>&m=<e2e4-e7e5-...>&a=<action>
+// Format: #t=<gameType>&g=<gameId>&m=<mv1-mv2-…>&a=<action>&p=<pubkey>
 // The hash fragment never leaves the browser, and every link carries the
 // complete move history so both players re-validate the whole game locally.
-// The bundle is game-agnostic: `t` selects the rules engine; move-token syntax
-// is validated per game. Chess is the first engine.
+// `t` selects the rules engine from the registry; move-token syntax is
+// validated per game before any engine sees it.
 
-import { createGame } from "./chess-engine.js";
+import { GAMES, gameModule } from "./games/registry.js";
 
-export const GAME_TYPES = { chess: { moveRe: /^[a-h][1-8][a-h][1-8][qrbn]?$/ } };
 const GAME_ID_RE = /^[0-9a-f]{6,32}$/;
 const ACTIONS = new Set(["res", "do", "da"]); // resign, draw offer, draw accept
-export const MAX_LINK_MOVES = 512;
+export const MAX_LINK_MOVES = 1024;
 
 export function generateGameId() {
   const bytes = new Uint8Array(6);
@@ -18,15 +17,13 @@ export function generateGameId() {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-export function moveToken(record) {
-  return record.from + record.to + (record.promotion || "");
-}
-
 export function encodeLink({ gameType = "chess", gameId, moves, action, pubkey }) {
   const params = new URLSearchParams();
   if (gameType !== "chess") params.set("t", gameType); // chess is the default, keeps links short
   params.set("g", gameId);
-  if (moves.length) params.set("m", moves.join("-"));
+  // "." separator: some games' tokens legitimately contain "-" (checkers chains,
+  // morris moves), so "-" can't delimit. "." appears in no token grammar.
+  if (moves.length) params.set("m", moves.join("."));
   if (action) params.set("a", action);
   if (pubkey) params.set("p", pubkey); // sender's Nostr pubkey, lets the opener pair for relay sync
   const base = location.origin + location.pathname;
@@ -38,47 +35,33 @@ export function parseHash(hash) {
   if (!raw) return null;
   const params = new URLSearchParams(raw);
   const gameType = params.get("t") || "chess";
-  const typeDef = GAME_TYPES[gameType];
-  if (!typeDef) return { ok: false, reason: "unknown-game-type" };
+  const mod = GAMES[gameType];
+  if (!mod) return { ok: false, reason: "unknown-game-type" };
   const gameId = params.get("g");
   if (!gameId || !GAME_ID_RE.test(gameId)) return { ok: false, reason: "bad-game-id" };
   const action = params.get("a") || null;
   if (action && !ACTIONS.has(action)) return { ok: false, reason: "bad-action" };
   const movesRaw = params.get("m") || "";
-  const moves = movesRaw ? movesRaw.split("-") : [];
+  // Legacy chess links (pre-bundle) used "-" as the separator; chess tokens
+  // themselves never contain "-", so that split stays unambiguous.
+  const sep = movesRaw.includes(".") ? "." : gameType === "chess" ? "-" : ".";
+  const moves = movesRaw ? movesRaw.split(sep) : [];
   if (moves.length > MAX_LINK_MOVES) return { ok: false, reason: "too-many-moves" };
   for (const m of moves) {
-    if (!typeDef.moveRe.test(m)) return { ok: false, reason: "bad-move-token" };
+    if (!mod.meta.moveRe.test(m)) return { ok: false, reason: "bad-move-token" };
   }
   const pubkeyRaw = params.get("p");
   const pubkey = pubkeyRaw && /^[0-9a-f]{64}$/.test(pubkeyRaw) ? pubkeyRaw : null;
   return { ok: true, gameType, gameId, moves, action, pubkey };
 }
 
-// Replays a token list through chess.js. Returns { ok, game, records } or { ok:false }.
-export function replayMoves(moves) {
-  const game = createGame();
-  const records = [];
-  for (const token of moves) {
-    const from = token.slice(0, 2);
-    const to = token.slice(2, 4);
-    const promotion = token.length > 4 ? token[4] : undefined;
-    let result;
-    try {
-      result = game.move({ from, to, promotion });
-    } catch {
-      result = null;
-    }
-    if (!result) return { ok: false, reason: "illegal-move", at: records.length };
-    records.push({
-      san: result.san,
-      from: result.from,
-      to: result.to,
-      promotion: result.promotion || null,
-      fenAfter: game.fen(),
-    });
-  }
-  return { ok: true, game, records };
+// Replays a token list through the game's engine.
+export function replayMoves(gameType, moves, gameId) {
+  const mod = gameModule(gameType);
+  if (!mod) return { ok: false, reason: "unknown-game-type" };
+  const engine = mod.createEngine(moves, { gameId });
+  if (!engine) return { ok: false, reason: "illegal-move" };
+  return { ok: true, engine };
 }
 
 // An incoming link is valid against local history when it is the same game

@@ -1,6 +1,7 @@
 import { state, setState } from "./state.js";
-import { showHandoffScreen } from "./ui.js";
-import { el } from "./ui.js";
+import { showHandoffScreen, playerName, el } from "./ui.js";
+import { generateGameId } from "./link-codec.js";
+import { gameModule } from "./games/registry.js";
 
 export class HotseatController {
   constructor(gameController) {
@@ -12,31 +13,27 @@ export class HotseatController {
       mode: "hotseat",
       localColor: null,
       connectionState: "not-applicable",
-      boardOrientation: state.rotateAfterMove ? "white" : "white",
+      boardOrientation: "white",
     });
-    this.gc.startNewGame();
+    this.gc.newGame(state.gameType, generateGameId());
   }
 
-  afterLocalMove(record, moveResult) {
+  afterLocalMove() {
     if (state.phase !== "active") return;
-    const nextColor = this.gc.game.turn() === "w" ? "white" : "black";
-    const boardEl = el("board");
-
-    const doRotateOrShow = () => {
-      if (state.rotateAfterMove) {
-        boardEl.classList.add("rotating");
-        this.gc.setOrientation(nextColor);
-        window.setTimeout(() => boardEl.classList.remove("rotating"), 220);
-      }
-      if (state.showHandoffScreen) {
-        this.gc.setInteractive(false);
-        showHandoffScreen(nextColor, () => {
-          this.gc.setInteractive(true);
-        });
-      }
-    };
-
-    doRotateOrShow();
+    const rotatable = gameModule(state.gameType).meta.rotatable;
+    const nextColor = this.gc.engine.turn() === "w" ? "white" : "black";
+    if (rotatable && state.rotateAfterMove) {
+      const boardEl = el("board");
+      boardEl.classList.add("rotating");
+      this.gc.setOrientation(nextColor);
+      window.setTimeout(() => boardEl.classList.remove("rotating"), 220);
+    }
+    if (state.showHandoffScreen) {
+      this.gc.setInteractive(false);
+      showHandoffScreen(playerName(nextColor), () => {
+        this.gc.setInteractive(true);
+      });
+    }
   }
 
   undo() {
