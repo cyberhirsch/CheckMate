@@ -56,7 +56,10 @@ export class GameController {
   }
 
   _syncBoard(lastMove) {
-    const orientation = state.boardOrientation;
+    // Online mode: your color is always at the bottom, unconditionally.
+    // Hotseat mode: orientation follows the rotation toggle / manual rotate.
+    const orientation =
+      state.mode !== "hotseat" && state.localColor ? state.localColor : state.boardOrientation;
     const interactive = this._isLocalTurnInteractive();
     this.boardView.update({ game: this.game, orientation, lastMove, interactive });
   }
