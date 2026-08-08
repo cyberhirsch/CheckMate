@@ -1,4 +1,4 @@
-const CACHE_NAME = "checkmate-shell-v3";
+const CACHE_NAME = "checkmate-shell-v4";
 const SHELL_FILES = [
   "./",
   "./index.html",
