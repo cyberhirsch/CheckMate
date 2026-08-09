@@ -11,3 +11,4 @@ android/.gradle/
 android/*.apk
 android/*.aab
 android/*.idsig
+dl/
