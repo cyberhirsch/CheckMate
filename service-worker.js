@@ -1,4 +1,4 @@
-const CACHE_NAME = "checkmate-shell-v15";
+const CACHE_NAME = "checkmate-shell-v16";
 const SHELL_FILES = [
   "./",
   "./index.html",
@@ -39,6 +39,10 @@ const SHELL_FILES = [
   "./src/games/breakthrough.js",
   "./src/games/ur.js",
   "./assets/icon.svg",
+  "./assets/icon-192.png",
+  "./assets/icon-512.png",
+  "./assets/icon-maskable-192.png",
+  "./assets/icon-maskable-512.png",
 ];
 
 self.addEventListener("install", (event) => {

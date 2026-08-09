@@ -1,0 +1,13 @@
+# Signing material — never commit. Losing it means losing the Play listing;
+# leaking it means anyone can sign updates as you. Back it up privately.
+android/*.keystore
+android/keystore-secrets.txt
+
+# Bubblewrap build output
+android/build/
+android/app/
+android/gradle*
+android/.gradle/
+android/*.apk
+android/*.aab
+android/*.idsig
