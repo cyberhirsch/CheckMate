@@ -106,7 +106,11 @@ Language is auto-detected from `navigator.languages` on first visit, then persis
 
 The app is a small screen stack rather than one page hiding parts of itself: **menu** → **select** → **game**, with **continue** and **friends** hanging off the menu. Back always means one step toward the menu. Mode (offline/online) is chosen by which "new game" the player picks, not a persistent tab, so the game-selection screen knows its own intent — including "choose a game for {friend}" when arriving from a friend invite.
 
-**Sharing is surfaced only when the opponent genuinely needs it**: before pairing (the first move of an online game) and whenever a relay publish fails. In those cases the QR is rendered immediately alongside Share/Copy rather than sitting behind a button. Once paired, the panel disappears and moves flow over relays; a manual Share button in the game controls covers the occasional "send it again".
+**Sharing is surfaced only when the opponent genuinely needs it**: before pairing (the first move of an online game) and whenever a relay publish fails. It appears as a **modal sheet**, never as a panel in the page flow — the game screen must never grow taller than the viewport. The QR renders immediately alongside Share/Copy rather than sitting behind a button. Once paired the sheet stays away and moves flow over relays; a Share button in the game controls reopens it on demand.
+
+"Paired" means we hold the opponent's pubkey, which is true as soon as we open their link *or* address an invite to a friend — an invited friend is reachable from the outset, so the inviter is never asked to share a link. Links always carry `p=`; the transport keypair is awaited before a link is emitted so this can't race.
+
+**No scrolling during play.** On phones the game screen is locked to `100svh` (small viewport units, so it holds as browser chrome shows and hides). The board is capped to the height actually left after header, status and controls; move history scrolls inside itself rather than scrolling the page. Verified at 375×812 and 320×568 across square, tall and wide boards.
 
 ## 7. Design language
 

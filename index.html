@@ -60,6 +60,21 @@
   </div>
 </div>
 
+<!-- Send your move: a sheet, so the game screen itself never needs to scroll -->
+<div id="send-modal" class="sheet-modal hidden" role="dialog" aria-modal="true" data-i18n-aria="panel.sendMove">
+  <div class="sheet sheet-compact">
+    <h2 data-i18n="panel.sendMove">Send your move</h2>
+    <p class="sheet-hint" data-i18n="share.scanHint"></p>
+    <canvas id="link-qr" class="qr-canvas"></canvas>
+    <div class="btn-row">
+      <button type="button" id="share-link-btn" class="btn btn-primary" data-i18n="btn.share">Share</button>
+      <button type="button" id="copy-link-btn" class="btn" data-i18n="btn.copyLink">Copy</button>
+    </div>
+    <textarea id="link-output" readonly rows="2" aria-label="Move link"></textarea>
+    <button type="button" id="send-close-btn" class="btn" data-i18n="btn.done">Done</button>
+  </div>
+</div>
+
 <div id="app">
   <header class="app-header">
     <button type="button" id="back-btn" class="icon-btn icon-btn-left hidden" data-i18n-aria="btn.menu">‹</button>
@@ -146,18 +161,8 @@
 
         <div id="relay-status" class="relay-status online-only" role="status"></div>
 
-        <!-- Shown when the opponent actually needs the link: first move, or relay failure -->
-        <div id="send-panel" class="send-panel hidden">
-          <h3 class="step-label" data-i18n="panel.sendMove">Send your move</h3>
-          <p class="sheet-hint" id="send-hint" data-i18n="share.scanHint"></p>
-          <canvas id="link-qr" class="qr-canvas"></canvas>
-          <div class="btn-row">
-            <button type="button" id="share-link-btn" class="btn btn-primary" data-i18n="btn.share">Share</button>
-            <button type="button" id="copy-link-btn" class="btn" data-i18n="btn.copyLink">Copy</button>
-          </div>
-          <textarea id="link-output" readonly rows="2" aria-label="Move link"></textarea>
-        </div>
 
+        <div id="game-controls"
         <div id="game-controls" class="game-controls">
           <button type="button" id="rotate-btn" class="btn hotseat-only rotatable-only" data-i18n="btn.rotate">Rotate</button>
           <button type="button" id="undo-btn" class="btn hotseat-only" data-i18n="btn.undo">Undo</button>

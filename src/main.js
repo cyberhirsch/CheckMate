@@ -59,10 +59,9 @@ const online = new OnlineController(gameController, {
   // pairing, or when the relays could not take the move.
   onLinkReady: (link, { needsShare }) => {
     el("link-output").value = link;
-    if (needsShare) showSendPanel(link);
-    else el("send-panel").classList.add("hidden");
+    if (needsShare) openSendModal(link);
   },
-  onIncomingApplied: () => el("send-panel").classList.add("hidden"),
+  onIncomingApplied: () => closeSendModal(),
   onRelayStatus: (status) => {
     const line = el("relay-status");
     line.textContent = status ? t("relay." + status) : "";
@@ -76,12 +75,16 @@ transport.setHandlers({
   onInvite: (pubkey, payload) => online.handleInvite(pubkey, payload),
 });
 
-async function showSendPanel(link) {
-  const panel = el("send-panel");
-  panel.classList.remove("hidden");
+async function openSendModal(link) {
+  el("link-output").value = link;
+  el("send-modal").classList.remove("hidden");
   const canvas = el("link-qr");
   const ok = await renderQR(canvas, link);
   canvas.classList.toggle("hidden", !ok);
+}
+
+function closeSendModal() {
+  el("send-modal").classList.add("hidden");
 }
 
 /* ---------- Game selection ---------- */
@@ -175,7 +178,7 @@ el("menu-friends").addEventListener("click", () => {
 });
 
 el("back-btn").addEventListener("click", () => {
-  el("send-panel").classList.add("hidden");
+  closeSendModal();
   history.replaceState(null, "", location.pathname);
   refreshMenu();
   showScreen("menu");
@@ -232,7 +235,8 @@ el("accept-draw-btn").addEventListener("click", () => {
   online.acceptDraw();
 });
 el("reject-draw-btn").addEventListener("click", () => online.declineDraw());
-el("share-btn").addEventListener("click", () => showSendPanel(online.currentLink()));
+el("share-btn").addEventListener("click", () => openSendModal(online.currentLink()));
+el("send-close-btn").addEventListener("click", closeSendModal);
 
 /* ---------- Share / copy ---------- */
 

@@ -7,7 +7,7 @@
 // and keeps the rest up to date in storage as their moves arrive.
 
 import { state, setState } from "./state.js";
-import { saveGame, getGame, addFriend, getProfile, activeGameIds } from "./storage.js";
+import { saveGame, getGame, addFriend, friendName, getProfile, activeGameIds } from "./storage.js";
 import { generateGameId, encodeLink, parseHash, replayMoves, extendsHistory } from "./link-codec.js";
 import { announce } from "./ui.js";
 import { t } from "./i18n.js";
@@ -107,7 +107,11 @@ export class OnlineController {
     return !this.opponentPubkey;
   }
 
-  _broadcast() {
+  async _broadcast() {
+    // The link must carry our pubkey, otherwise whoever opens it cannot pair
+    // and will think they have to keep sharing links back. Wait for the key
+    // before publishing the link anywhere.
+    if (this.transport && !this.transport.available) await this.transport.init();
     this.onLinkReady(this.currentLink(), { needsShare: this.needsShare() });
     this._publishToRelays();
   }
@@ -150,8 +154,13 @@ export class OnlineController {
   /* ---------- Friends and invites ---------- */
 
   // Starts a game and pushes the invite straight to a friend's relay inbox.
+  // We addressed it to a known friend, so they count as paired from the outset:
+  // their client can already receive our moves and no link is needed.
   async inviteFriend(pubkey, gameType) {
     this.startNewGame(gameType);
+    this.opponentPubkey = pubkey;
+    this.opponentName = friendName(pubkey);
+    this._persist();
     if (!this.transport || !this.transport.available) {
       const ok = this.transport && (await this.transport.init());
       if (!ok) return false;

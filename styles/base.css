@@ -601,3 +601,18 @@ body[data-mode="hotseat"] .hotseat-only { display: inline-flex; }
 body[data-mode="online"] .online-only { display: inline-flex; }
 body[data-rotatable="no"] .rotatable-only { display: none !important; }
 body[data-phase="finished"] #game-controls .btn:not(#share-btn) { display: none; }
+
+
+.sheet-compact { gap: 10px; padding: 16px; }
+.sheet-compact .qr-canvas { max-width: min(180px, 45vw); margin: 0 auto; }
+.sheet-compact textarea {
+  width: 100%;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.62rem;
+  border: 1px solid var(--border-color);
+  background: var(--bg-color);
+  color: var(--dimmer-text);
+  padding: 6px;
+  resize: none;
+  line-height: 1.4;
+}
