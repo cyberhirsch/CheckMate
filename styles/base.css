@@ -616,3 +616,14 @@ body[data-phase="finished"] #game-controls .btn:not(#share-btn) { display: none;
   resize: none;
   line-height: 1.4;
 }
+
+
+/* Friend list inside the send sheet: compact, scrolls within itself */
+.send-friends {
+  max-height: 132px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.send-friends .entry { min-height: 44px; padding: 6px 10px; }
+.send-friends::-webkit-scrollbar { width: 4px; }
+.send-friends::-webkit-scrollbar-thumb { background: var(--border-bright); }

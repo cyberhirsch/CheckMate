@@ -197,6 +197,8 @@ const STRINGS = {
     "addFriend.added": "Added {name} as a friend.",
     "addFriend.shareTitle": "Add me on Checkmate",
 
+    "sendTo.friends": "Or send to a friend",
+
     "game.chess": "Chess",
     "game.c4": "Connect Four",
     "game.ttt": "Tic-Tac-Toe",
@@ -399,6 +401,8 @@ const STRINGS = {
     "addFriend.added": "{name} als Freund hinzugefügt.",
     "addFriend.shareTitle": "Add mich bei Checkmate",
 
+    "sendTo.friends": "Oder an einen Freund senden",
+
     "game.chess": "Schach",
     "game.c4": "Vier gewinnt",
     "game.ttt": "Tic-Tac-Toe",
@@ -600,6 +604,8 @@ const STRINGS = {
     "addFriend.self": "Bu senin kendi bağlantın.",
     "addFriend.added": "{name} arkadaş olarak eklendi.",
     "addFriend.shareTitle": "Checkmate'te beni ekle",
+
+    "sendTo.friends": "Ya da bir arkadaşa gönder",
 
     "game.chess": "Satranç",
     "game.c4": "Dört Yan Yana",
@@ -805,6 +811,8 @@ const STRINGS = {
     "addFriend.added": "O/İ {name} epien filos.",
     "addFriend.shareTitle": "Vale me so Checkmate",
 
+    "sendTo.friends": "I steilon ato son ena filon",
+
     "game.chess": "Skaki",
     "game.c4": "Tessera si sira",
     "game.ttt": "Triliza",
@@ -1007,6 +1015,8 @@ const STRINGS = {
     "addFriend.added": "{name} aggiunto agli amici.",
     "addFriend.shareTitle": "Aggiungimi su Checkmate",
 
+    "sendTo.friends": "Oppure invia a un amico",
+
     "game.chess": "Scacchi",
     "game.c4": "Forza 4",
     "game.ttt": "Tris",
@@ -1208,6 +1218,8 @@ const STRINGS = {
     "addFriend.self": "这是你自己的链接。",
     "addFriend.added": "已将 {name} 添加为好友。",
     "addFriend.shareTitle": "在 Checkmate 上加我",
+
+    "sendTo.friends": "或发送给好友",
 
     "game.chess": "国际象棋",
     "game.c4": "四子棋",

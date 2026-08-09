@@ -176,6 +176,28 @@ export class OnlineController {
     return sent;
   }
 
+  // Hands the current (unpaired) game to a friend: pins them as the opponent
+  // and drops the invite — moves included — straight into their relay inbox.
+  async sendCurrentGameToFriend(pubkey) {
+    if (this.opponentPubkey) return false; // already paired, nothing to hand over
+    this.opponentPubkey = pubkey;
+    this.opponentName = friendName(pubkey);
+    this._persist();
+    if (!this.transport.available) {
+      const ok = await this.transport.init();
+      if (!ok) return false;
+    }
+    const sent = await this.transport.publishInvite(pubkey, {
+      gameId: state.gameId,
+      gameType: state.gameType,
+      moves: this.moves,
+      name: this.myName(),
+    });
+    if (sent) announce(t("msg.inviteSent"));
+    else announce(t("msg.relaysUnreachable"));
+    return sent;
+  }
+
   // An invite landed in our inbox: record it as a game we can open, but do not
   // yank the player out of whatever they are doing.
   handleInvite(senderPubkey, payload) {

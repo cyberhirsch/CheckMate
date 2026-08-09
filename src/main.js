@@ -79,10 +79,45 @@ transport.setHandlers({
 
 async function openSendModal(link) {
   el("link-output").value = link;
+  renderSendFriends();
   el("send-modal").classList.remove("hidden");
   const canvas = el("link-qr");
   const ok = await renderQR(canvas, link);
   canvas.classList.toggle("hidden", !ok);
+}
+
+// Friends inside the send sheet: one tap hands the game straight to them.
+// Only offered while the game is unpaired — once an opponent holds the game,
+// it cannot be redirected to someone else.
+function renderSendFriends() {
+  const block = el("send-friends-block");
+  const list = el("send-friends-list");
+  const friends = listFriends().sort((a, b) => (b.lastPlayed || 0) - (a.lastPlayed || 0));
+  const show = state.mode === "online" && online.needsShare() && friends.length > 0;
+  block.classList.toggle("hidden", !show);
+  list.innerHTML = "";
+  if (!show) return;
+  for (const f of friends) {
+    const li = document.createElement("li");
+    li.className = "entry";
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "entry-open";
+    const text = document.createElement("span");
+    text.className = "entry-text";
+    const title = document.createElement("span");
+    title.className = "entry-title";
+    title.textContent = (f.name || "").trim() || t("friends.unnamed");
+    text.appendChild(title);
+    btn.appendChild(text);
+    btn.addEventListener("click", async () => {
+      closeSendModal();
+      await online.sendCurrentGameToFriend(f.pubkey);
+      renderStatusBar();
+    });
+    li.appendChild(btn);
+    list.appendChild(li);
+  }
 }
 
 function closeSendModal() {
