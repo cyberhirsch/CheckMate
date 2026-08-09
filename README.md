@@ -18,7 +18,9 @@ Available in **English, Deutsch, Türkçe, Romeika, Italiano and 中文**.
 | ♙ | Breakthrough | ◔ | Mancala |
 | 𒀭 | Royal Game of Ur | | |
 
-Every game supports both modes, full rules validation, move history, undo (hotseat), resignation, and draws.
+Every game supports both modes, full rules validation, undo (hotseat), resignation, and draws.
+
+The board is strictly monochrome — black, white and greys, no colour anywhere. Pieces aren't told apart by hue but by a heavy contrasting outline, so a black stone reads clearly on a dark board and a white one on a light square.
 
 ## Two modes
 
@@ -46,6 +48,18 @@ There is deliberately no push notification when the app or browser is fully clos
 
 The app opens on a main menu: **New offline game**, **New online game**, **Continue** (with a badge counting games waiting on you), and **Friends**. Either "new game" leads to a game-selection screen; picking a game starts it straight away.
 
+## Catching up, and learning the rules
+
+There's no move list. Coming back to a correspondence game, what you actually want is *what just happened* — so a **Last move** button loops a pulse over the squares your opponent touched, in any game, until you tap it again.
+
+The space that would have held a move list shows a short **How to play** instead, for games that carry one. A game opts in by listing translation keys:
+
+```js
+export const meta = { …, tutorial: ["tut.ur.1", "tut.ur.2", …] };
+```
+
+Games without a tutorial hide the panel rather than showing an empty box. The Royal Game of Ur has one so far.
+
 ## Players, games and friends
 
 Set a display name the first time you open the app (changeable any time from the settings panel). Your identity is a keypair generated on your device — no account, nothing sent anywhere but your public key.
@@ -67,13 +81,13 @@ The interface, game names, player names and every status message are translated 
 
 **Romeika** deserves a note: it's the Pontic Greek variety still spoken around Trabzon and Of in north-east Türkiye — endangered, overwhelmingly oral, and without a standardized written form. Its speakers are literate in Turkish, so it's written here in Turkish orthography rather than Greek script, which is how speakers themselves write it when they write it at all. The strings in `src/i18n.js` are a best effort and **corrections from native speakers are very welcome** — open an issue or a PR.
 
-Adding a language means adding one block to `STRINGS` in `src/i18n.js` (122 keys) and one entry to `LANGUAGES`. Missing keys fall back to English rather than breaking.
+Adding a language means adding one block to `STRINGS` in `src/i18n.js` (200 keys) and one entry to `LANGUAGES`. Missing keys fall back to English rather than breaking.
 
 ## Tech
 
 - Plain ES modules, no build step, no framework.
 - [chess.js](https://github.com/jhlywa/chess.js) vendored locally; the other 12 engines are self-contained.
-- [nostr-tools](https://github.com/nbd-wtf/nostr-tools) for relay transport, [qrcode](https://github.com/soldair/node-qrcode)/[jsqr](https://github.com/cozmo/jsQR) for QR links — all vendored locally in `src/vendor/`, no CDN fetches at runtime.
+- [nostr-tools](https://github.com/nbd-wtf/nostr-tools) for relay transport, [qrcode](https://github.com/soldair/node-qrcode) for QR links — all vendored locally in `src/vendor/`, no CDN fetches at runtime.
 - Service worker + web app manifest: installable, offline-capable.
 - Android app via [Capacitor](https://capacitorjs.com) — bundles the same code locally, no address bar. See `android/ANDROID.md`.
 - Design: dark monochrome instrument panel — Inter / Outfit / JetBrains Mono, pure black surfaces, hairline borders, no accent color.
@@ -101,7 +115,21 @@ Then open `http://localhost:8080`. (ES modules don't run from `file://`.)
 
 ## Deploy
 
-Any static host with HTTPS — GitHub Pages, Netlify, Cloudflare Pages. Links automatically point at wherever the app is hosted.
+Any static host with HTTPS — GitHub Pages, Netlify, Cloudflare Pages. Links automatically point at wherever the app is hosted. Bump `CACHE_NAME` in `service-worker.js` on every deploy, or returning visitors keep the cached shell.
+
+## Android app
+
+Packaged with [Capacitor](https://capacitorjs.com): the site is copied into the APK and loads from disk, so there's no address bar and no server round-trip to start a game. Online play still reaches the public relays over the internet exactly as the website does — only the code is local.
+
+```bash
+npm run cap:sync     # stage the site into www/ and copy it into the project
+npm run icons        # regenerate launcher icons + splash from Graphics/Logo2.png
+npm run screenshots  # Play Store captures at 1080x1350 (needs Chrome)
+```
+
+Then build the signed release APK with Gradle — see `android/ANDROID.md` for the JDK/SDK setup and the Windows quirks.
+
+The trade-off versus the old Trusted Web Activity: app updates now need a rebuild and reinstall instead of arriving with a site deploy.
 
 ## Project structure
 
@@ -110,6 +138,14 @@ index.html              app shell
 manifest.webmanifest    PWA manifest
 service-worker.js       offline cache (bump CACHE_NAME on deploy)
 PRD.md                  product requirements
+capacitor.config.json   Android wrapper config
+android/                Capacitor Android project (+ ANDROID.md)
+resources/              icon / splash sources for capacitor-assets
+scripts/
+  build-www.js          stages the site into www/ for Capacitor
+  gen-icons.js          icons + splash from Graphics/Logo2.png
+  screenshots.js        Play Store captures via headless Chrome
+  genqr.mjs             QR to the sideload APK on this LAN
 styles/                 base / board / games / mobile / desktop CSS
 src/
   main.js               bootstrap and wiring
@@ -121,7 +157,7 @@ src/
   link-codec.js         URL hash encode / decode / validate
   nostr.js              signed relay transport
   ui.js, mode-controller.js, storage.js, qr.js
-  vendor/               vendored deps: chess.js, nostr-tools, qrcode, jsqr
+  vendor/               vendored deps: chess.js, nostr-tools, qrcode
   games/
     registry.js         game registration
     grid-view.js        shared square-grid renderer

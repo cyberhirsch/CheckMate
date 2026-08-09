@@ -54,7 +54,7 @@ const STRINGS = {
     "btn.tapWhenReady": "Tap when ready",
 
     "panel.sendMove": "Send your move",
-    "panel.moves": "Moves",
+    "panel.howToPlay": "How to play",
     "panel.choose": "Choose",
     "draw.offered": "Opponent offers a draw",
     "handoff.pass": "Pass the device to {name}",
@@ -209,6 +209,14 @@ const STRINGS = {
     "notify.drawOfferedTitle": "{name} offers a draw",
     "notify.inviteTitle": "{name} invited you to play",
 
+    "btn.lastMove": "Last move",
+    "tut.ur.1": "Race all seven of your pieces along your path and bear them off. First to finish wins.",
+    "tut.ur.2": "Four dice give a roll of 0 to 4. Roll a zero and your turn is skipped.",
+    "tut.ur.3": "Tap a piece to advance it, or bring a new one in from your pool.",
+    "tut.ur.4": "The middle row is shared. Land on an opponent's piece there and it goes back to their pool.",
+    "tut.ur.5": "Rosettes give you another roll, and the middle rosette is safe from capture.",
+    "tut.ur.6": "Bearing a piece off needs the exact roll to pass the final square.",
+
     "game.chess": "Chess",
     "game.c4": "Connect Four",
     "game.ttt": "Tic-Tac-Toe",
@@ -268,7 +276,7 @@ const STRINGS = {
     "btn.tapWhenReady": "Tippen, wenn bereit",
 
     "panel.sendMove": "Zug senden",
-    "panel.moves": "Züge",
+    "panel.howToPlay": "Spielanleitung",
     "panel.choose": "Auswählen",
     "draw.offered": "Gegner bietet Remis an",
     "handoff.pass": "Gerät an {name} weitergeben",
@@ -423,6 +431,14 @@ const STRINGS = {
     "notify.drawOfferedTitle": "{name} bietet Remis an",
     "notify.inviteTitle": "{name} hat dich eingeladen",
 
+    "btn.lastMove": "Letzter Zug",
+    "tut.ur.1": "Bring alle sieben Steine über deinen Pfad ins Ziel. Wer zuerst fertig ist, gewinnt.",
+    "tut.ur.2": "Vier Würfel ergeben 0 bis 4. Bei einer Null setzt du aus.",
+    "tut.ur.3": "Tippe einen Stein an, um ihn zu ziehen, oder setze einen neuen aus dem Vorrat ein.",
+    "tut.ur.4": "Die mittlere Reihe ist gemeinsam. Wer dort auf einen gegnerischen Stein zieht, schickt ihn zurück in dessen Vorrat.",
+    "tut.ur.5": "Rosetten bringen einen weiteren Wurf, und die mittlere Rosette schützt vor dem Schlagen.",
+    "tut.ur.6": "Zum Herausziehen brauchst du die genaue Augenzahl über das letzte Feld hinaus.",
+
     "game.chess": "Schach",
     "game.c4": "Vier gewinnt",
     "game.ttt": "Tic-Tac-Toe",
@@ -482,7 +498,7 @@ const STRINGS = {
     "btn.tapWhenReady": "Hazırsan dokun",
 
     "panel.sendMove": "Hamleni gönder",
-    "panel.moves": "Hamleler",
+    "panel.howToPlay": "Nasıl oynanır",
     "panel.choose": "Seç",
     "draw.offered": "Rakip beraberlik öneriyor",
     "handoff.pass": "Cihazı {name} oyuncusuna ver",
@@ -637,6 +653,14 @@ const STRINGS = {
     "notify.drawOfferedTitle": "{name} beraberlik öneriyor",
     "notify.inviteTitle": "{name} seni oyuna davet etti",
 
+    "btn.lastMove": "Son hamle",
+    "tut.ur.1": "Yedi taşını da yolun boyunca götürüp dışarı çıkar. İlk bitiren kazanır.",
+    "tut.ur.2": "Dört zar 0 ile 4 arası atış verir. Sıfır atarsan sıranı kaçırırsın.",
+    "tut.ur.3": "Bir taşa dokunup ilerlet ya da havuzdan yeni bir taş sür.",
+    "tut.ur.4": "Orta sıra ortaktır. Orada rakibin taşının üstüne gelirsen o taş havuzuna geri döner.",
+    "tut.ur.5": "Gül işaretleri sana bir atış daha verir; ortadaki gül taşını kırılmaktan korur.",
+    "tut.ur.6": "Taşı dışarı çıkarmak için son kareyi tam sayıyla geçmen gerekir.",
+
     "game.chess": "Satranç",
     "game.c4": "Dört Yan Yana",
     "game.ttt": "XOX",
@@ -698,7 +722,7 @@ const STRINGS = {
     "btn.tapWhenReady": "Pate atan ise etimos",
 
     "panel.sendMove": "Steilon tin kinisi su",
-    "panel.moves": "Kinisis",
+    "panel.howToPlay": "Pos na peznis",
     "panel.choose": "Diale",
     "draw.offered": "O andipalos prosferi isopalia",
     "handoff.pass": "Dos to cihaz ston {name}",
@@ -853,6 +877,14 @@ const STRINGS = {
     "notify.drawOfferedTitle": "O/İ {name} prosferi isopalia",
     "notify.inviteTitle": "O/İ {name} se ekalesen na paiksete",
 
+    "btn.lastMove": "Teleftaia kinisi",
+    "tut.ur.1": "Fere ta efta petras su ap' to monopati ke vgale ata ekso. Atos pu telioni proton kerdizi.",
+    "tut.ur.2": "Ta tessera zaria dinun ap' to 0 os to 4. An erthi miden, hanis tin sira su.",
+    "tut.ur.3": "Angikse ena petron na to pais embros, i vale neon ap' to apothema.",
+    "tut.ur.4": "İ mesi sira en kini. An katevis apano s'ena petron tu andipalu eki, pai piso s'to apothema atu.",
+    "tut.ur.5": "Ta triandafila dinun allon zarin, ke to meson triandafilon filai ap' to çakisma.",
+    "tut.ur.6": "Ya na vgalis ena petron, hriazete o akrivis arithmos na perasi to teleftaion tetragonon.",
+
     "game.chess": "Skaki",
     "game.c4": "Tessera si sira",
     "game.ttt": "Triliza",
@@ -912,7 +944,7 @@ const STRINGS = {
     "btn.tapWhenReady": "Tocca quando sei pronto",
 
     "panel.sendMove": "Invia la tua mossa",
-    "panel.moves": "Mosse",
+    "panel.howToPlay": "Come si gioca",
     "panel.choose": "Scegli",
     "draw.offered": "L'avversario offre la patta",
     "handoff.pass": "Passa il dispositivo a {name}",
@@ -1067,6 +1099,14 @@ const STRINGS = {
     "notify.drawOfferedTitle": "{name} offre la patta",
     "notify.inviteTitle": "{name} ti ha invitato a giocare",
 
+    "btn.lastMove": "Ultima mossa",
+    "tut.ur.1": "Porta tutte e sette le pedine lungo il percorso e falle uscire. Vince chi finisce per primo.",
+    "tut.ur.2": "Quattro dadi danno un punteggio da 0 a 4. Con lo zero salti il turno.",
+    "tut.ur.3": "Tocca una pedina per farla avanzare, oppure fanne entrare una nuova dalla riserva.",
+    "tut.ur.4": "La fila centrale è condivisa: se ci finisci sopra una pedina avversaria, torna nella sua riserva.",
+    "tut.ur.5": "Le rosette danno un altro lancio, e quella centrale mette al riparo dalle catture.",
+    "tut.ur.6": "Per far uscire una pedina serve il punteggio esatto per superare l'ultima casella.",
+
     "game.chess": "Scacchi",
     "game.c4": "Forza 4",
     "game.ttt": "Tris",
@@ -1126,7 +1166,7 @@ const STRINGS = {
     "btn.tapWhenReady": "准备好后点击",
 
     "panel.sendMove": "发送你的棋步",
-    "panel.moves": "棋谱",
+    "panel.howToPlay": "玩法",
     "panel.choose": "选择",
     "draw.offered": "对手提议和棋",
     "handoff.pass": "请把设备交给{name}",
@@ -1280,6 +1320,14 @@ const STRINGS = {
     "notify.drawAcceptedTitle": "已同意和棋",
     "notify.drawOfferedTitle": "{name} 提议和棋",
     "notify.inviteTitle": "{name} 邀请你对局",
+
+    "btn.lastMove": "上一步",
+    "tut.ur.1": "让七枚棋子沿着你的路线走完并移出棋盘，先完成的一方获胜。",
+    "tut.ur.2": "四枚骰子掷出 0 到 4 点。掷出 0 点就轮空。",
+    "tut.ur.3": "点击棋子让它前进，或从待入区放入一枚新棋子。",
+    "tut.ur.4": "中间一行是共用的：在那里落到对方棋子上，会把它送回对方待入区。",
+    "tut.ur.5": "玫瑰格可以再掷一次，中间的玫瑰格还能免于被吃。",
+    "tut.ur.6": "移出棋子需要恰好越过最后一格的点数。",
 
     "game.chess": "国际象棋",
     "game.c4": "四子棋",

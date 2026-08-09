@@ -8,6 +8,8 @@ export const meta = {
   players: { w: "player.sun", b: "player.moon" },
   rotatable: false,
   freeAspect: true,
+  // Shown beside the board in place of a move list. Any game can declare one.
+  tutorial: ["tut.ur.1", "tut.ur.2", "tut.ur.3", "tut.ur.4", "tut.ur.5", "tut.ur.6"],
   moveRe: /^(1[0-4]|[0-9]|x)$/,
 };
 

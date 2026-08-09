@@ -6,12 +6,19 @@
   "scripts": {
     "serve": "http-server -p 8080 -c-1",
     "build:www": "node scripts/build-www.js",
+    "icons": "node scripts/gen-icons.js && capacitor-assets generate --android --assetPath resources",
+    "screenshots": "node scripts/screenshots.js",
     "cap:sync": "npm run build:www && npx cap sync android"
   },
   "devDependencies": {
     "@capacitor/android": "^8.5.0",
     "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.5.0",
-    "@capacitor/core": "^8.5.0"
+    "@capacitor/core": "^8.5.0",
+    "puppeteer-core": "^25.5.0",
+    "sharp": "^0.35.3"
+  },
+  "dependencies": {
+    "@capacitor/share": "^8.0.1"
   }
 }

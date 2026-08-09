@@ -22,6 +22,9 @@ export class BoardHost {
     this.selection = null;
     this.lastMove = null;
     this.container.classList.toggle("free-aspect", !!module.meta.freeAspect);
+    // Boards that aren't square declare their own ratio, so cells stay square.
+    if (module.meta.aspect) this.container.style.setProperty("--board-aspect", module.meta.aspect);
+    else this.container.style.removeProperty("--board-aspect");
     this.view = module.createView(this.container);
     this.view.onTap((cellId) => this._handleTap(cellId));
     this.render();

@@ -6,6 +6,7 @@ export const meta = {
   glyph: "◍",
   players: { w: "player.red", b: "player.yellow" },
   rotatable: false,
+  aspect: "7 / 6",   // 7 columns x 6 rows — square board would squash the cells
   moveRe: /^[0-6]$/,
 };
 

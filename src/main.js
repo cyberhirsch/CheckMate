@@ -36,6 +36,10 @@ import { encodeFriendLink, parseFriendHash } from "./link-codec.js";
 
 migrateLegacy();
 
+// Running inside the Capacitor shell rather than a browser tab. Android draws
+// the WebView edge-to-edge, so the header needs guaranteed status-bar clearance.
+if (window.Capacitor) document.body.classList.add("native-app");
+
 /* ---------- Core wiring ---------- */
 
 const boardHost = new BoardHost(el("board"), {
@@ -277,6 +281,13 @@ setListHandlers(
 
 /* ---------- Game controls ---------- */
 
+// Toggles a looping pulse on whatever the board marked as the last move — the
+// move list is gone, so this is how you catch up on what the opponent did.
+el("last-move-btn").addEventListener("click", () => {
+  const on = document.body.classList.toggle("highlight-last-move");
+  el("last-move-btn").setAttribute("aria-pressed", String(on));
+});
+
 el("rotate-btn").addEventListener("click", () => hotseat.manualRotate());
 el("undo-btn").addEventListener("click", () => hotseat.undo());
 el("draw-btn").addEventListener("click", () => hotseat.endAsDraw());
@@ -310,17 +321,30 @@ async function copyText(text) {
   }
 }
 
-el("copy-link-btn").addEventListener("click", () => copyText(el("link-output").value));
-el("share-link-btn").addEventListener("click", async () => {
-  const link = el("link-output").value;
-  if (navigator.share) {
+// Android WebView has no navigator.share, so inside the Capacitor app the
+// native Share plugin is used instead. Browsers keep the Web Share API, and
+// anything without either falls back to copying the link.
+async function shareLink(title, link) {
+  const nativeShare = window.Capacitor?.Plugins?.Share;
+  if (nativeShare) {
     try {
-      await navigator.share({ title: t("share.title"), url: link });
+      await nativeShare.share({ title, url: link, dialogTitle: title });
       return;
     } catch { /* cancelled */ }
+    return;
+  }
+  if (navigator.share) {
+    try {
+      await navigator.share({ title, url: link });
+      return;
+    } catch { /* cancelled */ }
+    return;
   }
   await copyText(link);
-});
+}
+
+el("copy-link-btn").addEventListener("click", () => copyText(el("link-output").value));
+el("share-link-btn").addEventListener("click", () => shareLink(t("share.title"), el("link-output").value));
 
 /* ---------- Settings + welcome ---------- */
 
@@ -428,16 +452,9 @@ el("add-friend-btn").addEventListener("click", openAddFriendModal);
 el("friend-close-btn").addEventListener("click", closeAddFriendModal);
 el("friend-add-btn").addEventListener("click", () => addFriendFromText(el("friend-paste-input").value));
 el("friend-copy-btn").addEventListener("click", () => copyText(el("friend-qr").dataset.link || myFriendLink()));
-el("friend-share-btn").addEventListener("click", async () => {
-  const link = el("friend-qr").dataset.link || myFriendLink();
-  if (navigator.share) {
-    try {
-      await navigator.share({ title: t("addFriend.shareTitle"), url: link });
-      return;
-    } catch { /* cancelled */ }
-  }
-  await copyText(link);
-});
+el("friend-share-btn").addEventListener("click", () =>
+  shareLink(t("addFriend.shareTitle"), el("friend-qr").dataset.link || myFriendLink())
+);
 
 function buildLanguagePicker() {
   const sel = el("lang-select");

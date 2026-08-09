@@ -192,6 +192,7 @@
 
 
         <div id="game-controls" class="game-controls">
+          <button type="button" id="last-move-btn" class="btn" aria-pressed="false" data-i18n="btn.lastMove">Last move</button>
           <button type="button" id="rotate-btn" class="btn hotseat-only rotatable-only" data-i18n="btn.rotate">Rotate</button>
           <button type="button" id="undo-btn" class="btn hotseat-only" data-i18n="btn.undo">Undo</button>
           <button type="button" id="resign-btn" class="btn" data-i18n="btn.resign">Resign</button>
@@ -210,9 +211,9 @@
           </div>
         </div>
 
-        <div class="move-history-panel">
-          <h2 data-i18n="panel.moves">Moves</h2>
-          <ol id="move-history-list"></ol>
+        <div id="tutorial-panel" class="tutorial-panel hidden">
+          <h2 data-i18n="panel.howToPlay">How to play</h2>
+          <ul id="tutorial-list"></ul>
         </div>
       </aside>
     </div>

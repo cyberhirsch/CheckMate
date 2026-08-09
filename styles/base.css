@@ -104,8 +104,27 @@ button { -webkit-tap-highlight-color: transparent; }
 
 .app-header {
   position: relative;
-  padding: 14px 14px calc(8px + var(--safe-top));
+  /* The safe-area inset belongs on the TOP — the page is viewport-fit=cover,
+     so without it the logo sits under the status bar / camera cutout. */
+  padding: calc(14px + var(--safe-top)) 14px 8px;
   text-align: center;
+  /* The back/settings buttons are absolutely positioned at top 10px and are
+     36px tall, so the header has to be at least that tall or they spill over
+     the screen below it. The 2px is breathing room under the button. */
+  min-height: calc(10px + 36px + 2px + var(--safe-top));
+}
+
+/* Android targets SDK 36, where edge-to-edge is mandatory, so the WebView
+   draws behind the status bar. Some WebViews still report a zero inset, which
+   would leave the logo under the camera — so in the native app the top gap
+   never drops below a status bar's worth. */
+body.native-app .app-header {
+  padding-top: calc(14px + max(var(--safe-top), 28px));
+  min-height: calc(10px + 36px + 2px + max(var(--safe-top), 28px));
+}
+body.native-app .icon-btn,
+body.native-app .lang-select {
+  top: calc(10px + max(var(--safe-top), 28px));
 }
 
 .lang-select {
@@ -138,7 +157,7 @@ html[lang^="zh"] .btn,
 html[lang^="zh"] .step-label,
 html[lang^="zh"] .toggle-row,
 html[lang^="zh"] .game-name,
-html[lang^="zh"] .move-history-panel h2 { letter-spacing: 0.02rem; }
+html[lang^="zh"] .tutorial-panel h2 { letter-spacing: 0.02rem; }
 .logo {
   margin: 0;
   font-family: var(--font-ui);
@@ -185,7 +204,7 @@ html[lang^="zh"] .move-history-panel h2 { letter-spacing: 0.02rem; }
 
 /* ---------- Panels ---------- */
 
-.move-history-panel, .draw-offer-banner {
+.tutorial-panel, .draw-offer-banner {
   background: var(--surface-1);
   border: 1px solid var(--border-color);
   padding: 16px;
@@ -312,7 +331,13 @@ body[data-phase="setup"] .relay-status { display: none; }
 .btn-row .btn { flex: 1 1 auto; }
 
 .qr-canvas {
-  max-width: 200px;
+  /* A definite width plus height:auto — the responsive-image pattern. With
+     width:auto a canvas uses its intrinsic 220x220 pair and max-width then
+     clamps only the width, squashing the QR out of square and making it hard
+     to scan. Giving width a real value lets height follow the ratio. */
+  width: 200px;
+  max-width: 100%;
+  height: auto;
   margin: 4px auto;
   display: block;
   background: #fff;
@@ -336,7 +361,7 @@ body[data-phase="setup"] .relay-status { display: none; }
 
 /* ---------- Move history ---------- */
 
-.move-history-panel h2 {
+.tutorial-panel h2 {
   font-family: var(--font-ui);
   font-size: 0.72rem;
   font-weight: 400;
@@ -345,19 +370,20 @@ body[data-phase="setup"] .relay-status { display: none; }
   text-transform: uppercase;
   letter-spacing: 0.15rem;
 }
-#move-history-list {
+#tutorial-list {
   margin: 0;
-  padding-left: 1.6em;
-  max-height: 220px;
+  padding-left: 1.15em;
+  max-height: 240px;
   overflow-y: auto;
-  font-family: "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--dimmer-text);
-  line-height: 1.7;
+  line-height: 1.55;
 }
-#move-history-list::-webkit-scrollbar { width: 4px; }
-#move-history-list::-webkit-scrollbar-thumb { background: var(--border-bright); }
-#move-history-list::-webkit-scrollbar-track { background: transparent; }
+#tutorial-list li { margin-bottom: 8px; }
+#tutorial-list li:last-child { margin-bottom: 0; }
+#tutorial-list::-webkit-scrollbar { width: 4px; }
+#tutorial-list::-webkit-scrollbar-thumb { background: var(--border-bright); }
+#tutorial-list::-webkit-scrollbar-track { background: transparent; }
 
 /* ---------- Icon button (header) ---------- */
 
@@ -366,6 +392,7 @@ body[data-phase="setup"] .relay-status { display: none; }
   right: 12px;
   top: calc(10px + var(--safe-top));
   width: 36px;
+  /* stays aligned with the header's native-app top gap, see .app-header */
   height: 36px;
   display: inline-flex;
   align-items: center;

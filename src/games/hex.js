@@ -89,11 +89,14 @@ export function createView(container) {
   for (let r = 0; r < SIZE; r++) {
     const row = document.createElement("div");
     row.className = "hex-row";
-    row.style.marginLeft = `${r * 2.6}%`;
     for (let f = 0; f < SIZE; f++) {
       const id = FILES[f] + (r + 1);
       const c = document.createElement("div");
       c.className = "hex-cell";
+      // Rhombus stagger: half a cell per row. It sits on the first cell rather
+      // than the row, because a margin on the row would shrink the row and the
+      // cells' percentage widths along with it — making lower rows smaller.
+      if (f === 0 && r > 0) c.style.marginLeft = `${r * 3.125}%`;
       c.dataset.cell = id;
       c.setAttribute("tabindex", "0");
       c.addEventListener("click", () => tapCb && tapCb(id));

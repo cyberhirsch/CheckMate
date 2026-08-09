@@ -144,6 +144,21 @@ export function createEngine(tokens = []) {
   return engine;
 }
 
+// The lines live in an SVG that is inset within the board (see .morris-lines)
+// and whose viewBox carries padding around the 0..100 line coordinates. The
+// tap points are plain divs positioned against the board, so they have to
+// repeat that same mapping — otherwise the targets drift off the drawn
+// intersections, badly at the edges.
+const SVG_INSET = 4;                 // .morris-lines `inset`, in %
+const SVG_SPAN = 92;                 // .morris-lines width/height, in %
+const VB_MIN = -8, VB_SIZE = 116;    // the SVG viewBox
+
+// A board coordinate (0..6) as a percentage of the board box.
+function pointPct(coord) {
+  const inViewBox = coord * 100 / 6;
+  return SVG_INSET + (SVG_SPAN * (inViewBox - VB_MIN)) / VB_SIZE;
+}
+
 export function createView(container) {
   container.innerHTML = "";
   const board = document.createElement("div");
@@ -154,14 +169,14 @@ export function createView(container) {
     const [x2, y2] = POINTS[m[2]];
     return `<line x1="${x1 * 100 / 6}" y1="${y1 * 100 / 6}" x2="${x2 * 100 / 6}" y2="${y2 * 100 / 6}"/>`;
   }).join("");
-  board.innerHTML = `<svg class="morris-lines" viewBox="-8 -8 116 116" preserveAspectRatio="none">${svgLines}</svg>`;
+  board.innerHTML = `<svg class="morris-lines" viewBox="${VB_MIN} ${VB_MIN} ${VB_SIZE} ${VB_SIZE}" preserveAspectRatio="none">${svgLines}</svg>`;
   const cellEls = new Map();
   let tapCb = null;
   POINTS.forEach(([x, y], p) => {
     const c = document.createElement("div");
     c.className = "morris-point";
-    c.style.left = `${x * 100 / 6}%`;
-    c.style.top = `${y * 100 / 6}%`;
+    c.style.left = `${pointPct(x)}%`;
+    c.style.top = `${pointPct(y)}%`;
     c.dataset.cell = String(p);
     c.setAttribute("tabindex", "0");
     c.addEventListener("click", () => tapCb && tapCb(String(p)));

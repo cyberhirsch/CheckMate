@@ -56,18 +56,26 @@ export function renderStatusBar() {
       : "";
 }
 
-export function renderMoveHistory() {
-  const list = el("move-history-list");
+// The move list was replaced by this: a game may declare `meta.tutorial` as a
+// list of translation keys, and they're shown beside the board. Games without
+// one simply hide the panel rather than leaving an empty box.
+export function renderTutorial() {
+  const panel = el("tutorial-panel");
+  const list = el("tutorial-list");
+  const mod = state.gameType ? gameModule(state.gameType) : null;
+  const steps = mod && mod.meta.tutorial;
+  if (!steps || !steps.length) {
+    panel.classList.add("hidden");
+    list.innerHTML = "";
+    return;
+  }
   list.innerHTML = "";
-  const history = state.moveHistory;
-  for (let i = 0; i < history.length; i += 2) {
+  for (const key of steps) {
     const li = document.createElement("li");
-    const a = history[i];
-    const b = history[i + 1];
-    li.textContent = `${a ? a.label : ""}${b ? "  " + b.label : ""}`;
+    li.textContent = t(key);
     list.appendChild(li);
   }
-  list.scrollTop = list.scrollHeight;
+  panel.classList.remove("hidden");
 }
 
 export function renderModeUI() {
@@ -260,7 +268,7 @@ export function renderFriendsList() {
 export function renderAll() {
   applyStaticTranslations();
   renderStatusBar();
-  renderMoveHistory();
+  renderTutorial();
   renderModeUI();
   renderDrawBanner();
   renderGamesList();
