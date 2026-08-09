@@ -11,6 +11,32 @@ const GAME_ID_RE = /^[0-9a-f]{6,32}$/;
 const ACTIONS = new Set(["res", "do", "da"]); // resign, draw offer, draw accept
 export const MAX_LINK_MOVES = 1024;
 
+// Where shared links should point. Inside the Capacitor app the page is served
+// from https://localhost, so location.origin would produce links that resolve
+// to the *recipient's* own device — useless once sent. Native builds therefore
+// fall back to the canonical public URL. Update this when the site moves.
+const PUBLIC_BASE = "https://cyberhirsch.github.io/CheckMate/";
+
+// True for the Capacitor WebView and for a plain `file://` open — anywhere the
+// current origin is meaningless to anyone else.
+function originIsPrivate() {
+  const h = location.hostname;
+  return (
+    !!window.Capacitor ||
+    location.protocol === "file:" ||
+    h === "localhost" ||
+    h === "127.0.0.1" ||
+    h === "" ||
+    h === "[::1]"
+  );
+}
+
+// The base every shareable link is built on, with a trailing-slash-safe path.
+export function linkBase() {
+  if (originIsPrivate()) return PUBLIC_BASE;
+  return location.origin + location.pathname;
+}
+
 export function generateGameId() {
   const bytes = new Uint8Array(6);
   crypto.getRandomValues(bytes);
@@ -27,7 +53,7 @@ export function encodeLink({ gameType = "chess", gameId, moves, action, pubkey, 
   if (action) params.set("a", action);
   if (pubkey) params.set("p", pubkey); // sender's Nostr pubkey, lets the opener pair for relay sync
   if (name) params.set("n", name.slice(0, 32)); // display name, capped so links stay short
-  const base = location.origin + location.pathname;
+  const base = linkBase();
   return `${base}#${params.toString()}`;
 }
 
@@ -75,7 +101,7 @@ export function encodeFriendLink({ pubkey, name }) {
   const params = new URLSearchParams();
   params.set("f", pubkey);
   if (name) params.set("n", name.slice(0, 32));
-  const base = location.origin + location.pathname;
+  const base = linkBase();
   return `${base}#${params.toString()}`;
 }
 

@@ -9,7 +9,9 @@ const ROOT = path.resolve(__dirname, "..");
 const OUT = path.join(ROOT, "www");
 
 const FILES = ["index.html", "manifest.webmanifest", "service-worker.js"];
-const DIRS = ["assets", "styles", "src"];
+// .well-known carries assetlinks.json, which Android fetches from the site
+// root to verify the app may open checkmate.sebhirsch.com links.
+const DIRS = ["assets", "styles", "src", ".well-known"];
 
 function copyDir(src, dest) {
   fs.mkdirSync(dest, { recursive: true });

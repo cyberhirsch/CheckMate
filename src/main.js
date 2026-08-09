@@ -476,9 +476,12 @@ function buildLanguagePicker() {
 
 /* ---------- Incoming links ---------- */
 
-function consumeHash() {
-  if (!location.hash || location.hash.length < 2) return false;
-  const friendLink = parseFriendHash(location.hash);
+// `raw` lets a link that arrived from outside the app be fed in directly; with
+// no argument this reads the address bar as before.
+function consumeHash(raw) {
+  const hash = raw === undefined ? location.hash : raw;
+  if (!hash || hash.length < 2) return false;
+  const friendLink = parseFriendHash(hash);
   if (friendLink) {
     history.replaceState(null, "", location.pathname);
     if (!friendLink.ok) {
@@ -494,12 +497,30 @@ function consumeHash() {
     notifyFriendAdded(friendLink.pubkey);
     return true;
   }
-  const consumed = online.handleIncoming(location.hash);
+  const consumed = online.handleIncoming(hash);
   history.replaceState(null, "", location.pathname);
   if (consumed) showScreen("game");
   return consumed;
 }
 window.addEventListener("hashchange", () => consumeHash());
+
+// A link tapped elsewhere on the phone reaches the app as an intent, not as a
+// navigation — the WebView is already loaded from localhost, so location.hash
+// never changes and hashchange never fires. Capacitor hands us the URL here.
+// Cold starts are covered by getLaunchUrl(), warm ones by the listener, and
+// both can fire for the same link, hence the guard.
+const nativeApp = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
+if (nativeApp) {
+  let lastHandled = null;
+  const openUrl = (url) => {
+    if (!url || url === lastHandled) return;
+    lastHandled = url;
+    const i = url.indexOf("#");
+    if (i >= 0) consumeHash(url.slice(i));
+  };
+  nativeApp.addListener("appUrlOpen", (event) => openUrl(event && event.url));
+  nativeApp.getLaunchUrl().then((res) => openUrl(res && res.url)).catch(() => {});
+}
 
 /* ---------- Boot ---------- */
 

@@ -18,6 +18,17 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Invite/move links open in the app instead of a browser. Needs
+                 assetlinks.json served over HTTPS at the host root, or Android
+                 12+ ignores the claim entirely. The game state rides in the
+                 URL fragment, which is passed through untouched. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="checkmate.sebhirsch.com" />
+            </intent-filter>
         </activity>
 
         <provider
