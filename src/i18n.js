@@ -199,6 +199,16 @@ const STRINGS = {
 
     "sendTo.friends": "Or send to a friend",
 
+    "settings.notify": "Notify me about opponent moves",
+    "settings.notifyHint": "Shows a notification when it's your turn, even if the app is in the background.",
+    "settings.notifyUnsupported": "Notifications aren't supported in this browser.",
+    "settings.notifyBlocked": "Notifications are blocked. Allow them for this site in your browser settings.",
+    "notify.moveTitle": "{name} moved",
+    "notify.resignedTitle": "{name} resigned",
+    "notify.drawAcceptedTitle": "Draw agreed",
+    "notify.drawOfferedTitle": "{name} offers a draw",
+    "notify.inviteTitle": "{name} invited you to play",
+
     "game.chess": "Chess",
     "game.c4": "Connect Four",
     "game.ttt": "Tic-Tac-Toe",
@@ -403,6 +413,16 @@ const STRINGS = {
 
     "sendTo.friends": "Oder an einen Freund senden",
 
+    "settings.notify": "Bei gegnerischen Zügen benachrichtigen",
+    "settings.notifyHint": "Zeigt eine Benachrichtigung, wenn du am Zug bist — auch im Hintergrund.",
+    "settings.notifyUnsupported": "Benachrichtigungen werden von diesem Browser nicht unterstützt.",
+    "settings.notifyBlocked": "Benachrichtigungen sind blockiert. Erlaube sie für diese Seite in den Browsereinstellungen.",
+    "notify.moveTitle": "{name} hat gezogen",
+    "notify.resignedTitle": "{name} hat aufgegeben",
+    "notify.drawAcceptedTitle": "Remis vereinbart",
+    "notify.drawOfferedTitle": "{name} bietet Remis an",
+    "notify.inviteTitle": "{name} hat dich eingeladen",
+
     "game.chess": "Schach",
     "game.c4": "Vier gewinnt",
     "game.ttt": "Tic-Tac-Toe",
@@ -606,6 +626,16 @@ const STRINGS = {
     "addFriend.shareTitle": "Checkmate'te beni ekle",
 
     "sendTo.friends": "Ya da bir arkadaşa gönder",
+
+    "settings.notify": "Rakip hamlelerinde bildirim gönder",
+    "settings.notifyHint": "Uygulama arka planda olsa bile sıra sana geldiğinde bildirim gösterir.",
+    "settings.notifyUnsupported": "Bu tarayıcı bildirimleri desteklemiyor.",
+    "settings.notifyBlocked": "Bildirimler engellendi. Tarayıcı ayarlarından bu site için izin ver.",
+    "notify.moveTitle": "{name} hamle yaptı",
+    "notify.resignedTitle": "{name} terk etti",
+    "notify.drawAcceptedTitle": "Beraberlikte anlaşıldı",
+    "notify.drawOfferedTitle": "{name} beraberlik öneriyor",
+    "notify.inviteTitle": "{name} seni oyuna davet etti",
 
     "game.chess": "Satranç",
     "game.c4": "Dört Yan Yana",
@@ -813,6 +843,16 @@ const STRINGS = {
 
     "sendTo.friends": "I steilon ato son ena filon",
 
+    "settings.notify": "Dikson me atan o andipalos paiz",
+    "settings.notifyHint": "Diknete mia ipomnisi atan en sira su, ke atan i efarmoği en piso.",
+    "settings.notifyUnsupported": "Afto to browser çi ipostirizi ipomnisis.",
+    "settings.notifyBlocked": "İ ipomnisis en klistes. Dose adia s’atto to site sa risthmisis tu browser.",
+    "notify.moveTitle": "O/İ {name} epaiksen",
+    "notify.resignedTitle": "O/İ {name} eparadothen",
+    "notify.drawAcceptedTitle": "Esimfonisan isopalia",
+    "notify.drawOfferedTitle": "O/İ {name} prosferi isopalia",
+    "notify.inviteTitle": "O/İ {name} se ekalesen na paiksete",
+
     "game.chess": "Skaki",
     "game.c4": "Tessera si sira",
     "game.ttt": "Triliza",
@@ -1017,6 +1057,16 @@ const STRINGS = {
 
     "sendTo.friends": "Oppure invia a un amico",
 
+    "settings.notify": "Avvisami delle mosse dell'avversario",
+    "settings.notifyHint": "Mostra una notifica quando tocca a te, anche con l'app in background.",
+    "settings.notifyUnsupported": "Le notifiche non sono supportate da questo browser.",
+    "settings.notifyBlocked": "Le notifiche sono bloccate. Consentile per questo sito nelle impostazioni del browser.",
+    "notify.moveTitle": "{name} ha mosso",
+    "notify.resignedTitle": "{name} ha abbandonato",
+    "notify.drawAcceptedTitle": "Patta concordata",
+    "notify.drawOfferedTitle": "{name} offre la patta",
+    "notify.inviteTitle": "{name} ti ha invitato a giocare",
+
     "game.chess": "Scacchi",
     "game.c4": "Forza 4",
     "game.ttt": "Tris",
@@ -1220,6 +1270,16 @@ const STRINGS = {
     "addFriend.shareTitle": "在 Checkmate 上加我",
 
     "sendTo.friends": "或发送给好友",
+
+    "settings.notify": "对手走棋时通知我",
+    "settings.notifyHint": "轮到你时会显示通知，即使应用在后台也一样。",
+    "settings.notifyUnsupported": "此浏览器不支持通知。",
+    "settings.notifyBlocked": "通知已被屏蔽。请在浏览器设置中为此网站允许通知。",
+    "notify.moveTitle": "{name} 走了一步",
+    "notify.resignedTitle": "{name} 已认输",
+    "notify.drawAcceptedTitle": "已同意和棋",
+    "notify.drawOfferedTitle": "{name} 提议和棋",
+    "notify.inviteTitle": "{name} 邀请你对局",
 
     "game.chess": "国际象棋",
     "game.c4": "四子棋",

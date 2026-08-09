@@ -36,6 +36,12 @@ Correspondence play where **neither player needs to be online at the same time**
 
 No server, no accounts, no matchmaking. The relays are free public infrastructure; the link is the fallback that always works.
 
+## Notifications
+
+An opt-in toggle in Settings turns on move notifications: an in-app toast while you're looking at the app, or a real OS notification banner if the tab is open but in the background (another app in front, or another browser tab). Tapping either jumps straight to that game.
+
+There is deliberately no push notification when the app or browser is fully closed — that would need something running online around the clock to watch relays and forward to Apple/Google's push services, which is exactly the kind of infrastructure this project has none of. See the PRD for the full reasoning.
+
 ## Getting around
 
 The app opens on a main menu: **New offline game**, **New online game**, **Continue** (with a badge counting games waiting on you), and **Friends**. Either "new game" leads to a game-selection screen; picking a game starts it straight away.

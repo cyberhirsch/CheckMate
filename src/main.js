@@ -30,6 +30,7 @@ import {
   setListHandlers,
 } from "./ui.js";
 import { LANGUAGES, detectLanguage, setLanguage, getLanguage, t } from "./i18n.js";
+import { notificationsSupported, requestPermission, setEnabled as setNotifyEnabled, onOpenGame } from "./notify.js";
 import { showScreen, getScreen } from "./screens.js";
 import { encodeFriendLink, parseFriendHash } from "./link-codec.js";
 
@@ -326,8 +327,36 @@ el("share-link-btn").addEventListener("click", async () => {
 el("settings-btn").addEventListener("click", () => {
   el("settings-name").value = getProfile().name;
   el("settings-pubkey").textContent = transport.pubkey || t("settings.identityPending");
+  const notifyToggle = el("notify-toggle");
+  const notifyHint = el("notify-hint");
+  const supported = notificationsSupported();
+  notifyToggle.disabled = !supported;
+  notifyToggle.checked = supported && getProfile().notificationsEnabled && Notification.permission === "granted";
+  notifyHint.textContent = !supported
+    ? t("settings.notifyUnsupported")
+    : Notification.permission === "denied"
+    ? t("settings.notifyBlocked")
+    : t("settings.notifyHint");
   el("settings-modal").classList.remove("hidden");
 });
+
+el("notify-toggle").addEventListener("change", async (e) => {
+  if (!e.target.checked) {
+    setNotifyEnabled(false);
+    return;
+  }
+  const result = await requestPermission();
+  if (result === "granted") {
+    setNotifyEnabled(true);
+  } else {
+    e.target.checked = false;
+    setNotifyEnabled(false);
+    el("notify-hint").textContent = t("settings.notifyBlocked");
+  }
+});
+
+// A toast or OS notification was tapped: bring the tab forward and open the game.
+onOpenGame((gameId) => openGame(gameId));
 
 el("settings-close-btn").addEventListener("click", () => {
   saveProfile({ name: el("settings-name").value.trim().slice(0, 24) });

@@ -45,6 +45,7 @@ export function getProfile() {
     gameType: p.gameType || "chess",
     rotateAfterMove: typeof p.rotateAfterMove === "boolean" ? p.rotateAfterMove : null,
     showHandoffScreen: typeof p.showHandoffScreen === "boolean" ? p.showHandoffScreen : false,
+    notificationsEnabled: typeof p.notificationsEnabled === "boolean" ? p.notificationsEnabled : false,
   };
 }
 

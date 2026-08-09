@@ -112,6 +112,17 @@ The app is a small screen stack rather than one page hiding parts of itself: **m
 
 **No scrolling during play.** On phones the game screen is locked to `100svh` (small viewport units, so it holds as browser chrome shows and hides). The board is capped to the height actually left after header, status and controls; move history scrolls inside itself rather than scrolling the page. Verified at 375×812 and 320×568 across square, tall and wide boards.
 
+## 6d. Notifications
+
+Opt-in, two tiers, both achievable with zero infrastructure because they only fire while the tab's own JS is alive to receive relay events:
+
+- **In-app toast** — shown whenever the tab is visible and focused. Bottom-sheet style, auto-dismisses after 5s, tap opens the game.
+- **OS notification banner** — shown instead of a toast when the tab is open but backgrounded (`document.visibilityState === "hidden"` or unfocused) and `Notification` permission is granted. Tap focuses the tab and opens the game via a `checkmate:open-game` custom event, keeping `notify.js` decoupled from screen routing.
+
+Triggers: opponent moves (current game and any background game), resign, draw offer/accept, and game invites. Permission is requested only from an explicit settings-toggle tap (never on load) since browsers penalize or auto-deny ungestured requests.
+
+**Deliberately excluded: push notifications when the app/browser is fully closed.** No client-side code runs in that state, so waking the OS requires a server watching relays continuously and forwarding to APNs/FCM — infrastructure this project has none of by design (see Non-goals, §2). Considered and explicitly declined in favor of staying serverless; revisit only if that non-goal changes.
+
 ## 7. Design language
 
 Dark monochrome instrument panel (Typegrid system): pure black ground, `#050505–#111` surface ladder, `#222` hairline borders, sharp corners, no accent color — active states invert to white. Type: **Outfit** for controls and labels (uppercase, letter-spaced), **Inter** for prose, **JetBrains Mono** for links and move history. Grayscale board (`#8b8b8b` / `#3c3c3c`), solid glyphs colored per side. All touch targets ≥ 44px.

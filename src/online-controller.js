@@ -9,8 +9,29 @@
 import { state, setState } from "./state.js";
 import { saveGame, getGame, addFriend, friendName, getProfile, activeGameIds } from "./storage.js";
 import { generateGameId, encodeLink, parseHash, replayMoves, extendsHistory } from "./link-codec.js";
-import { announce } from "./ui.js";
+import { announce, gameTitle } from "./ui.js";
 import { t } from "./i18n.js";
+import { notify } from "./notify.js";
+
+function notifyOpponentEvent(gameId, gameType, opponentName, action) {
+  const name = opponentName || t("friends.unnamed");
+  const game = gameTitle(gameType);
+  let title, body;
+  if (action === "res") {
+    title = t("notify.resignedTitle", { name });
+    body = game;
+  } else if (action === "da") {
+    title = t("notify.drawAcceptedTitle");
+    body = game;
+  } else if (action === "do") {
+    title = t("notify.drawOfferedTitle", { name });
+    body = game;
+  } else {
+    title = t("notify.moveTitle", { name });
+    body = game;
+  }
+  notify({ title, body, gameId, tag: gameId });
+}
 
 export class OnlineController {
   constructor(gameController, { transport, onLinkReady, onIncomingApplied, onRelayStatus, onGamesChanged }) {
@@ -217,7 +238,14 @@ export class OnlineController {
       status: { result: "active", winner: null },
       phase: "active",
     });
-    announce(t("msg.inviteReceived", { name: (payload.name || "").trim() || t("friends.unnamed") }));
+    const inviterName = (payload.name || "").trim() || t("friends.unnamed");
+    announce(t("msg.inviteReceived", { name: inviterName }));
+    notify({
+      title: t("notify.inviteTitle", { name: inviterName }),
+      body: gameTitle(payload.gameType),
+      gameId: payload.gameId,
+      tag: payload.gameId,
+    });
     this.onGamesChanged();
     this._ensureSubscriptions();
   }
@@ -268,6 +296,7 @@ export class OnlineController {
       if (!isNews) return;
       if (this._applyState({ moves: incoming, action: payload.action || null })) {
         this.onIncomingApplied();
+        notifyOpponentEvent(gameId, known.gameType, this.opponentName, payload.action || null);
       }
       return;
     }
@@ -292,6 +321,7 @@ export class OnlineController {
       phase: status.result === "win" || status.result === "draw" ? "finished" : "active",
     });
     this.onGamesChanged();
+    notifyOpponentEvent(gameId, known.gameType, senderName || known.opponentName, payload.action || null);
   }
 
   /* ---------- Actions ---------- */

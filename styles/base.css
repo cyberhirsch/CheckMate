@@ -627,3 +627,45 @@ body[data-phase="finished"] #game-controls .btn:not(#share-btn) { display: none;
 .send-friends .entry { min-height: 44px; padding: 6px 10px; }
 .send-friends::-webkit-scrollbar { width: 4px; }
 .send-friends::-webkit-scrollbar-thumb { background: var(--border-bright); }
+
+/* ---------- Toasts ---------- */
+
+#toast-host {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(12px + var(--safe-bottom));
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--surface-4);
+  border: 1px solid var(--border-bright);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+  padding: 12px 14px;
+  max-width: 420px;
+  margin: 0 auto;
+  width: 100%;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: auto;
+}
+.toast.toast-in { opacity: 1; transform: translateY(0); }
+.toast.toast-tappable { cursor: pointer; }
+.toast.toast-tappable:hover { border-color: var(--border-hover); }
+.toast-title {
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08rem;
+  color: var(--text-color);
+}
+.toast-body {
+  margin-top: 3px;
+  font-size: 0.8rem;
+  color: var(--dim-text);
+}
