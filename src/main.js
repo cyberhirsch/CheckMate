@@ -75,7 +75,25 @@ const online = new OnlineController(gameController, {
 transport.setHandlers({
   onGameState: (gameId, pubkey, payload) => online.handleRemoteState(gameId, pubkey, payload),
   onInvite: (pubkey, payload) => online.handleInvite(pubkey, payload),
+  // Someone we added by their link/QR just learned our pubkey and told us so;
+  // complete the friendship on our end too, with no action required from us.
+  onFriendRequest: (pubkey, payload) => {
+    const wasKnown = listFriends().some((f) => f.pubkey === pubkey);
+    addFriend(pubkey, payload.name);
+    if (!wasKnown) announce(t("addFriend.added", { name: (payload.name || "").trim() || t("friends.unnamed") }));
+    refreshMenu();
+  },
 });
+
+// After we add someone by their link/QR, tell their inbox so they add us
+// back automatically — friending should only ever take one side's action.
+async function notifyFriendAdded(pubkey) {
+  if (!transport.available) {
+    const ok = await transport.init();
+    if (!ok) return;
+  }
+  await transport.publishFriendRequest(pubkey, { name: getProfile().name || "" });
+}
 
 async function openSendModal(link) {
   el("link-output").value = link;
@@ -374,6 +392,7 @@ function addFriendFromText(raw) {
   announce(t("addFriend.added", { name: parsed.name || t("friends.unnamed") }));
   el("friend-paste-input").value = "";
   refreshMenu();
+  notifyFriendAdded(parsed.pubkey);
 }
 
 el("add-friend-btn").addEventListener("click", openAddFriendModal);
@@ -426,6 +445,7 @@ function consumeHash() {
     refreshMenu();
     renderFriendsList();
     showScreen("friends");
+    notifyFriendAdded(friendLink.pubkey);
     return true;
   }
   const consumed = online.handleIncoming(location.hash);

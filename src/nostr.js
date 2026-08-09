@@ -58,6 +58,7 @@ export class NostrTransport {
     this._tags = [];
     this._onGameState = () => {};
     this._onInvite = () => {};
+    this._onFriendRequest = () => {};
   }
 
   async init() {
@@ -112,9 +113,17 @@ export class NostrTransport {
     return this._publish(inboxTag(recipientPubkey), { type: "invite", ...payload });
   }
 
-  setHandlers({ onGameState, onInvite }) {
+  // Tells someone whose pubkey we just learned (via their link/QR) that we
+  // added them, carrying our own name. Their client adds us back on receipt,
+  // so friending only ever requires one side to act.
+  publishFriendRequest(recipientPubkey, payload) {
+    return this._publish(inboxTag(recipientPubkey), { type: "friend-request", ...payload });
+  }
+
+  setHandlers({ onGameState, onInvite, onFriendRequest }) {
     if (onGameState) this._onGameState = onGameState;
     if (onInvite) this._onInvite = onInvite;
+    if (onFriendRequest) this._onFriendRequest = onFriendRequest;
   }
 
   // Rebuilds the single subscription to cover the given game IDs plus our inbox.
@@ -146,8 +155,11 @@ export class NostrTransport {
           if (!payload || typeof payload !== "object") return;
 
           if (dTag.startsWith(INBOX_PREFIX)) {
-            if (payload.type !== "invite" || typeof payload.gameId !== "string") return;
-            this._onInvite(event.pubkey, payload);
+            if (payload.type === "invite" && typeof payload.gameId === "string") {
+              this._onInvite(event.pubkey, payload);
+            } else if (payload.type === "friend-request") {
+              this._onFriendRequest(event.pubkey, payload);
+            }
             return;
           }
           if (!Array.isArray(payload.moves)) return;
