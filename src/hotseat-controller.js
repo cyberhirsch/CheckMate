@@ -8,14 +8,29 @@ export class HotseatController {
     this.gc = gameController;
   }
 
-  start() {
+  start(gameType) {
     setState({
       mode: "hotseat",
+      gameType: gameType || state.gameType,
       localColor: null,
-      connectionState: "not-applicable",
       boardOrientation: "white",
     });
     this.gc.newGame(state.gameType, generateGameId());
+  }
+
+  // Reopens a stored hotseat game from the active-games list.
+  openStored(rec, engine) {
+    setState({
+      mode: "hotseat",
+      gameType: rec.gameType,
+      gameId: rec.gameId,
+      localColor: null,
+      boardOrientation: "white",
+    });
+    this.gc.loadEngine(rec.gameType, engine, rec.gameId);
+    if (rec.phase === "finished" && rec.status) {
+      setState({ phase: "finished", status: rec.status });
+    }
   }
 
   afterLocalMove() {

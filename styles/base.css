@@ -403,3 +403,185 @@ body[data-phase="setup"] .draw-offer-banner,
 body[data-phase="setup"] .send-panel { display: none; }
 
 .setup-hint.dim { opacity: 0.7; font-size: 0.75rem; }
+
+/* ---------- Icon button (header) ---------- */
+
+.icon-btn {
+  position: absolute;
+  right: 12px;
+  top: calc(10px + var(--safe-top));
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--dim-text);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.icon-btn:hover { color: var(--text-color); border-color: var(--border-hover); }
+.icon-btn:focus-visible { outline: 1px solid var(--text-color); outline-offset: 2px; }
+
+/* ---------- Sheet modals (welcome, settings) ---------- */
+
+.sheet-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow-y: auto;
+}
+.sheet {
+  background: var(--surface-4);
+  border: 1px solid var(--border-bright);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: auto;
+}
+.sheet h2 {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.12rem;
+  color: var(--text-color);
+}
+.sheet-hint {
+  margin: 0;
+  color: var(--dim-text);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field > span {
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1rem;
+  color: var(--dim-text);
+}
+.field input[type="text"], .field-input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+}
+.field input[type="text"]:focus, .field-input:focus {
+  outline: none;
+  border-color: var(--border-hover);
+}
+.field-input { font-family: var(--font-ui); text-transform: uppercase; letter-spacing: 0.05rem; cursor: pointer; }
+.field-input option { background: var(--bg-color); color: var(--text-color); }
+
+.identity {
+  display: block;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.62rem;
+  color: var(--dimmer-text);
+  word-break: break-all;
+  line-height: 1.5;
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-color);
+}
+
+/* ---------- Games / friends lists ---------- */
+
+.list-panel {
+  background: var(--surface-1);
+  border: 1px solid var(--border-color);
+  padding: 16px;
+}
+.list-panel h2 {
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 400;
+  margin: 0 0 10px;
+  color: var(--dim-text);
+  text-transform: uppercase;
+  letter-spacing: 0.15rem;
+}
+.entry-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.entry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  padding: 8px 10px;
+  min-height: 52px;
+}
+.entry-open {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  text-align: left;
+  min-width: 0;
+  padding: 0;
+  font-family: inherit;
+}
+.entry-glyph { font-size: 1.1rem; flex-shrink: 0; }
+.entry-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.entry-title {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.entry-sub {
+  font-family: var(--font-ui);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06rem;
+  color: var(--dim-text);
+}
+.entry.your-turn { border-color: var(--border-hover); }
+.entry.your-turn .entry-sub { color: var(--text-color); }
+.entry.finished .entry-glyph, .entry.finished .entry-title { opacity: 0.55; }
+.entry-action {
+  flex-shrink: 0;
+  min-height: 36px;
+  min-width: 36px;
+  padding: 6px 10px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--dim-text);
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.entry-action:hover { color: var(--text-color); border-color: var(--border-hover); }
+.list-empty { margin: 0; color: var(--dimmer-text); font-size: 0.78rem; font-style: italic; }
+.list-panel:not(.has-entries) .entry-list { display: none; }
+.list-panel.has-entries .list-empty { display: none; }
+
+/* Lists and setup only make sense between games. */
+body[data-phase="active"] .list-panel,
+body[data-phase="finished"] .list-panel { display: none; }
+body[data-phase="setup"] .move-history-panel { display: none; }

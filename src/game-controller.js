@@ -1,14 +1,15 @@
 import { gameModule } from "./games/registry.js";
 import { setState, state } from "./state.js";
-import { saveStored } from "./storage.js";
+import { saveGame } from "./storage.js";
 import { t } from "./i18n.js";
 
 export class GameController {
-  constructor({ boardHost, onAfterLocalMove, onGameOver, announce }) {
+  constructor({ boardHost, onAfterLocalMove, onGameOver, announce, onPersist }) {
     this.boardHost = boardHost;
     this.onAfterLocalMove = onAfterLocalMove;
     this.onGameOver = onGameOver;
     this.announce = announce || (() => {});
+    this.onPersist = onPersist;
     this.module = null;
     this.engine = null;
   }
@@ -22,6 +23,7 @@ export class GameController {
     this.engine = this.module.createEngine([], { gameId });
     setState({
       gameType,
+      gameId,
       fen: null,
       turn: "white",
       moveHistory: [],
@@ -40,6 +42,7 @@ export class GameController {
     this.engine = engine;
     setState({
       gameType,
+      gameId,
       turn: engine.turn() === "w" ? "white" : "black",
       moveHistory: engine.tokens.map((t) => ({ token: t, label: engine.describe(t) })),
       status: this._shellStatus(),
@@ -172,18 +175,22 @@ export class GameController {
     this.boardHost.setInteractive(flag);
   }
 
+  // Online games are persisted by OnlineController (it owns opponent data);
+  // here we only record hotseat games so they show up in the games list.
   _persist() {
-    saveStored({
-      mode: state.mode,
-      gameType: state.gameType,
-      linkMoves: this.tokens,
-      moveHistory: state.moveHistory,
-      status: state.status,
+    if (state.mode !== "hotseat" || !state.gameId) return;
+    saveGame({
       gameId: state.gameId,
-      localColor: state.localColor,
+      gameType: state.gameType,
+      mode: "hotseat",
+      localColor: null,
+      moves: this.tokens,
+      pendingAction: null,
+      opponentPubkey: null,
+      opponentName: "",
+      status: state.status,
       phase: state.phase,
-      rotateAfterMove: state.rotateAfterMove,
-      showHandoffScreen: state.showHandoffScreen,
     });
+    this.onPersist && this.onPersist();
   }
 }

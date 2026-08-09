@@ -18,10 +18,52 @@
 <body>
 <div id="live-region" aria-live="polite" class="sr-only"></div>
 
+<!-- First run: ask for a display name -->
+<div id="welcome-modal" class="sheet-modal hidden" role="dialog" aria-modal="true" data-i18n-aria="welcome.title">
+  <div class="sheet">
+    <h2 data-i18n="welcome.title">Welcome</h2>
+    <p class="sheet-hint" data-i18n="welcome.hint"></p>
+    <label class="field">
+      <span data-i18n="settings.name">Your name</span>
+      <input type="text" id="welcome-name" maxlength="24" autocomplete="nickname" data-i18n-placeholder="settings.namePlaceholder" />
+    </label>
+    <button type="button" id="welcome-start-btn" class="btn btn-primary btn-lg" data-i18n="welcome.start">Continue</button>
+  </div>
+</div>
+
+<!-- Settings -->
+<div id="settings-modal" class="sheet-modal hidden" role="dialog" aria-modal="true" data-i18n-aria="settings.title">
+  <div class="sheet">
+    <h2 data-i18n="settings.title">Settings</h2>
+    <label class="field">
+      <span data-i18n="settings.name">Your name</span>
+      <input type="text" id="settings-name" maxlength="24" autocomplete="nickname" data-i18n-placeholder="settings.namePlaceholder" />
+    </label>
+    <label class="field">
+      <span data-i18n="settings.language">Language</span>
+      <select id="lang-select" class="field-input"></select>
+    </label>
+    <label class="toggle-row rotatable-only">
+      <input type="checkbox" id="rotate-toggle" />
+      <span data-i18n="setup.rotateToggle">Rotate board each turn</span>
+    </label>
+    <label class="toggle-row">
+      <input type="checkbox" id="handoff-toggle" />
+      <span data-i18n="setup.handoffToggle">Show handoff screen</span>
+    </label>
+    <div class="field">
+      <span data-i18n="settings.identity">Your ID</span>
+      <code id="settings-pubkey" class="identity"></code>
+      <p class="sheet-hint" data-i18n="settings.identityHint"></p>
+    </div>
+    <button type="button" id="settings-close-btn" class="btn btn-primary btn-lg" data-i18n="btn.done">Done</button>
+  </div>
+</div>
+
 <div id="app">
   <header class="app-header">
     <h1 class="logo">CHECK<span>MATE</span></h1>
-    <select id="lang-select" class="lang-select" data-i18n-aria="lang.label"></select>
+    <button type="button" id="settings-btn" class="icon-btn" data-i18n-aria="settings.title">⚙</button>
   </header>
 
   <nav class="mode-switch" role="group" aria-label="Game mode">
@@ -50,7 +92,6 @@
 
       <div id="relay-status" class="relay-status online-only" role="status"></div>
 
-      <!-- Send-move panel: appears in online mode after your move -->
       <div id="send-panel" class="send-panel hidden">
         <h3 class="step-label" data-i18n="panel.sendMove">Send your move</h3>
         <div class="btn-row">
@@ -63,7 +104,7 @@
       </div>
 
       <div id="game-controls" class="game-controls">
-        <button type="button" id="new-game-btn" class="btn" data-i18n="btn.newGame">New Game</button>
+        <button type="button" id="back-btn" class="btn" data-i18n="btn.back">Back</button>
         <button type="button" id="rotate-btn" class="btn hotseat-only rotatable-only" data-i18n="btn.rotate">Rotate</button>
         <button type="button" id="undo-btn" class="btn hotseat-only" data-i18n="btn.undo">Undo</button>
         <button type="button" id="resign-btn" class="btn" data-i18n="btn.resign">Resign</button>
@@ -79,14 +120,6 @@
         <div id="hotseat-setup" class="setup-block">
           <p class="setup-hint" data-i18n="setup.hotseatHint"></p>
           <button type="button" id="start-hotseat-btn" class="btn btn-primary btn-lg" data-i18n="setup.startGame">Start Game</button>
-          <label class="toggle-row rotatable-only">
-            <input type="checkbox" id="rotate-toggle" />
-            <span data-i18n="setup.rotateToggle">Rotate board each turn</span>
-          </label>
-          <label class="toggle-row">
-            <input type="checkbox" id="handoff-toggle" />
-            <span data-i18n="setup.handoffToggle">Show handoff screen</span>
-          </label>
         </div>
 
         <div id="online-setup" class="setup-block">
@@ -97,6 +130,18 @@
           </button>
           <p class="setup-hint dim" data-i18n="setup.receivedLink"></p>
         </div>
+      </div>
+
+      <div id="games-panel" class="list-panel">
+        <h2 data-i18n="games.title">Your games</h2>
+        <ul id="games-list" class="entry-list"></ul>
+        <p id="games-empty" class="list-empty" data-i18n="games.empty"></p>
+      </div>
+
+      <div id="friends-panel" class="list-panel">
+        <h2 data-i18n="friends.title">Friends</h2>
+        <ul id="friends-list" class="entry-list"></ul>
+        <p id="friends-empty" class="list-empty" data-i18n="friends.empty"></p>
       </div>
 
       <div id="draw-offer-banner" class="draw-offer-banner hidden">

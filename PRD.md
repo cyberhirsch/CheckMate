@@ -92,6 +92,16 @@ Language is auto-detected from `navigator.languages` on first visit, then persis
 
 **Romeika** (`rom`, tagged `pnt-Latn`) is the Pontic Greek of Trabzon/Of — endangered, oral, with no standard orthography. It is written in **Turkish orthography**, matching how its speakers actually write it. These strings are a best effort pending native-speaker review; the file says so, and so does the README.
 
+## 6b. Identity, games list and friends
+
+**Identity** is a secp256k1 keypair generated on first run and kept in `localStorage`; the public key is the player's durable handle. A display name is collected on first launch and editable in settings; it travels in relay payloads and as `n=` on links, capped at 32 chars and only ever rendered via `textContent` since it arrives from strangers.
+
+**Storage is three stores** (`checkmate:profile:v2`, `:games:v2`, `:friends:v2`) with a one-time migration from the v1 single-game blob. The games map holds every game — hotseat and online — so several can run at once; finished games are pruned past 60.
+
+**One relay subscription** covers every unfinished online game plus a personal inbox tag `checkmate:inbox:<pubkey>`. Background games update in storage as their moves arrive, so the list shows "your turn" without opening them.
+
+**Friends** are auto-recorded from any paired opponent (link or relay). A friend invite is published to their inbox tag, so repeat opponents never exchange a link again — the one genuine remaining use of links is meeting someone new, plus recovery.
+
 ## 7. Design language
 
 Dark monochrome instrument panel (Typegrid system): pure black ground, `#050505–#111` surface ladder, `#222` hairline borders, sharp corners, no accent color — active states invert to white. Type: **Outfit** for controls and labels (uppercase, letter-spaced), **Inter** for prose, **JetBrains Mono** for links and move history. Grayscale board (`#8b8b8b` / `#3c3c3c`), solid glyphs colored per side. All touch targets ≥ 44px.

@@ -17,7 +17,7 @@ export function generateGameId() {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-export function encodeLink({ gameType = "chess", gameId, moves, action, pubkey }) {
+export function encodeLink({ gameType = "chess", gameId, moves, action, pubkey, name }) {
   const params = new URLSearchParams();
   if (gameType !== "chess") params.set("t", gameType); // chess is the default, keeps links short
   params.set("g", gameId);
@@ -26,6 +26,7 @@ export function encodeLink({ gameType = "chess", gameId, moves, action, pubkey }
   if (moves.length) params.set("m", moves.join("."));
   if (action) params.set("a", action);
   if (pubkey) params.set("p", pubkey); // sender's Nostr pubkey, lets the opener pair for relay sync
+  if (name) params.set("n", name.slice(0, 32)); // display name, capped so links stay short
   const base = location.origin + location.pathname;
   return `${base}#${params.toString()}`;
 }
@@ -52,7 +53,10 @@ export function parseHash(hash) {
   }
   const pubkeyRaw = params.get("p");
   const pubkey = pubkeyRaw && /^[0-9a-f]{64}$/.test(pubkeyRaw) ? pubkeyRaw : null;
-  return { ok: true, gameType, gameId, moves, action, pubkey };
+  // Names come from a stranger's link, so treat them as untrusted text: cap the
+  // length and let the DOM escape them (we only ever set textContent).
+  const name = (params.get("n") || "").slice(0, 32);
+  return { ok: true, gameType, gameId, moves, action, pubkey, name };
 }
 
 // Replays a token list through the game's engine.

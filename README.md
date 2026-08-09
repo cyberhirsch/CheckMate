@@ -35,6 +35,13 @@ Correspondence play where **neither player needs to be online at the same time**
 
 No server, no accounts, no matchmaking. The relays are free public infrastructure; the link is the fallback that always works.
 
+## Players, games and friends
+
+Set a display name the first time you open the app (changeable any time from the settings panel). Your identity is a keypair generated on your device — no account, nothing sent anywhere but your public key.
+
+- **Your games** — every game you're in, hotseat or online, with whose turn it is and how long ago it moved. Tap to resume, and games update themselves in the background as opponents' moves arrive.
+- **Friends** — anyone you play is remembered by their public key. Once you've played someone, you can invite them to a new game **straight through the relays, with no link at all** — the invite lands in their app and appears in their games list.
+
 ## How it stays honest without a server
 
 - Every link and relay event carries the **complete move history**, not a diff. Both clients replay and validate the whole game locally.

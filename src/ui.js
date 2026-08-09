@@ -1,6 +1,7 @@
 import { state, subscribe } from "./state.js";
 import { gameModule } from "./games/registry.js";
 import { t, tNote, applyStaticTranslations, onLanguageChange } from "./i18n.js";
+import { listGames, listFriends, getProfile } from "./storage.js";
 
 const el = (id) => document.getElementById(id);
 const liveRegion = () => el("live-region");
@@ -137,12 +138,133 @@ export function hideHandoffScreen() {
   el("handoff-screen").classList.add("hidden");
 }
 
+function relTime(ts) {
+  if (!ts) return "";
+  const mins = Math.round((Date.now() - ts) / 60000);
+  if (mins < 1) return t("time.now");
+  if (mins < 60) return t("time.minutes", { n: mins });
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return t("time.hours", { n: hours });
+  return t("time.days", { n: Math.round(hours / 24) });
+}
+
+// Games list. Callbacks are supplied once by main.js.
+let gameHandlers = { open: () => {}, remove: () => {} };
+let friendHandlers = { invite: () => {}, remove: () => {} };
+
+export function setListHandlers(games, friends) {
+  gameHandlers = games;
+  friendHandlers = friends;
+}
+
+export function renderGamesList() {
+  const panel = el("games-panel");
+  const list = el("games-list");
+  const games = listGames();
+  list.innerHTML = "";
+  panel.classList.toggle("has-entries", games.length > 0);
+  for (const g of games) {
+    const mod = gameModule(g.gameType);
+    const li = document.createElement("li");
+    li.className = "entry";
+    const finished = g.phase === "finished";
+    let sub;
+    if (finished) {
+      sub = t("games.finished");
+    } else if (g.mode === "hotseat") {
+      sub = t("mode.hotseat");
+    } else {
+      const replayTurn = (g.moves || []).length;
+      // Whose move it is follows from history length only for alternating games,
+      // so ask the engine instead — cheap for the list sizes we deal with.
+      const engine = mod && mod.createEngine(g.moves || [], { gameId: g.gameId });
+      const turnColor = engine ? (engine.turn() === "w" ? "white" : "black") : null;
+      const mine = turnColor && turnColor === g.localColor;
+      li.classList.toggle("your-turn", !!mine);
+      sub = mine ? t("games.yourTurn") : t("games.theirTurn");
+    }
+    li.classList.toggle("finished", finished);
+
+    const opponent = g.mode === "hotseat"
+      ? t("mode.hotseat")
+      : (g.opponentName || "").trim() || t("games.unknownOpponent");
+
+    const open = document.createElement("button");
+    open.type = "button";
+    open.className = "entry-open";
+    const glyph = document.createElement("span");
+    glyph.className = "entry-glyph";
+    glyph.textContent = mod ? mod.meta.glyph : "?";
+    const text = document.createElement("span");
+    text.className = "entry-text";
+    const title = document.createElement("span");
+    title.className = "entry-title";
+    // textContent, never innerHTML: opponent names arrive from strangers.
+    title.textContent = `${gameTitle(g.gameType)} · ${opponent}`;
+    const subEl = document.createElement("span");
+    subEl.className = "entry-sub";
+    subEl.textContent = `${sub} · ${relTime(g.updatedAt)}`;
+    text.append(title, subEl);
+    open.append(glyph, text);
+    open.addEventListener("click", () => gameHandlers.open(g.gameId));
+
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "entry-action";
+    del.textContent = "✕";
+    del.setAttribute("aria-label", t("games.delete"));
+    del.addEventListener("click", () => gameHandlers.remove(g.gameId));
+
+    li.append(open, del);
+    list.appendChild(li);
+  }
+}
+
+export function renderFriendsList() {
+  const panel = el("friends-panel");
+  const list = el("friends-list");
+  const friends = listFriends().sort((a, b) => (b.lastPlayed || 0) - (a.lastPlayed || 0));
+  list.innerHTML = "";
+  panel.classList.toggle("has-entries", friends.length > 0);
+  for (const f of friends) {
+    const li = document.createElement("li");
+    li.className = "entry";
+    const info = document.createElement("span");
+    info.className = "entry-text";
+    const title = document.createElement("span");
+    title.className = "entry-title";
+    title.textContent = (f.name || "").trim() || t("friends.unnamed");
+    const sub = document.createElement("span");
+    sub.className = "entry-sub";
+    sub.textContent = f.pubkey.slice(0, 12) + "…";
+    info.append(title, sub);
+
+    const invite = document.createElement("button");
+    invite.type = "button";
+    invite.className = "entry-action";
+    invite.textContent = t("friends.invite");
+    invite.addEventListener("click", () => friendHandlers.invite(f.pubkey));
+
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "entry-action";
+    del.textContent = "✕";
+    del.setAttribute("aria-label", t("friends.remove"));
+    del.addEventListener("click", () => friendHandlers.remove(f.pubkey));
+
+    li.append(info, invite, del);
+    list.appendChild(li);
+  }
+}
+
 export function renderAll() {
   applyStaticTranslations();
   renderStatusBar();
   renderMoveHistory();
   renderModeUI();
   renderDrawBanner();
+  renderGamesList();
+  renderFriendsList();
 }
 
 export function initReactiveUI() {
