@@ -1,5 +1,4 @@
-# Checkmate — Games by Link
-
+# Checkmate
 A serverless two-player game bundle. **13 turn-based games**, one static web app, no backend, no accounts, no database.
 
 **Play offline** on one device, or **play online** where moves sync automatically through public relays — with a shareable link as the universal fallback.
