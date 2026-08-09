@@ -102,6 +102,12 @@ Language is auto-detected from `navigator.languages` on first visit, then persis
 
 **Friends** are auto-recorded from any paired opponent (link or relay). A friend invite is published to their inbox tag, so repeat opponents never exchange a link again — the one genuine remaining use of links is meeting someone new, plus recovery.
 
+## 6c. Navigation
+
+The app is a small screen stack rather than one page hiding parts of itself: **menu** → **select** → **game**, with **continue** and **friends** hanging off the menu. Back always means one step toward the menu. Mode (offline/online) is chosen by which "new game" the player picks, not a persistent tab, so the game-selection screen knows its own intent — including "choose a game for {friend}" when arriving from a friend invite.
+
+**Sharing is surfaced only when the opponent genuinely needs it**: before pairing (the first move of an online game) and whenever a relay publish fails. In those cases the QR is rendered immediately alongside Share/Copy rather than sitting behind a button. Once paired, the panel disappears and moves flow over relays; a manual Share button in the game controls covers the occasional "send it again".
+
 ## 7. Design language
 
 Dark monochrome instrument panel (Typegrid system): pure black ground, `#050505–#111` surface ladder, `#222` hairline borders, sharp corners, no accent color — active states invert to white. Type: **Outfit** for controls and labels (uppercase, letter-spaced), **Inter** for prose, **JetBrains Mono** for links and move history. Grayscale board (`#8b8b8b` / `#3c3c3c`), solid glyphs colored per side. All touch targets ≥ 44px.

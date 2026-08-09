@@ -75,7 +75,7 @@ export class OnlineController {
     }
     const theirTurn = (replay.engine.turn() === "w" ? "white" : "black") !== rec.localColor;
     if (rec.phase !== "finished" && theirTurn && this.moves.length) {
-      this.onLinkReady(this.currentLink());
+      this.onLinkReady(this.currentLink(), { needsShare: this.needsShare() });
     }
     this._ensureSubscriptions();
     return true;
@@ -101,8 +101,14 @@ export class OnlineController {
     });
   }
 
+  // Sharing is required until the opponent is paired (they have no other way
+  // to receive the game) and whenever the relays refuse the move.
+  needsShare() {
+    return !this.opponentPubkey;
+  }
+
   _broadcast() {
-    this.onLinkReady(this.currentLink());
+    this.onLinkReady(this.currentLink(), { needsShare: this.needsShare() });
     this._publishToRelays();
   }
 
@@ -122,7 +128,10 @@ export class OnlineController {
       name: this.myName(),
     });
     this.onRelayStatus(ok ? "synced" : "offline");
-    if (!ok) announce(t("msg.relaysUnreachable"));
+    if (!ok) {
+      announce(t("msg.relaysUnreachable"));
+      this.onLinkReady(this.currentLink(), { needsShare: true });
+    }
   }
 
   async _ensureSubscriptions() {

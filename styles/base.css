@@ -132,7 +132,7 @@ button { -webkit-tap-highlight-color: transparent; }
 /* Chinese has no letter-spacing convention; the tracking we use for Latin
    micro-labels looks broken in Han script, so it is dropped there. */
 html[lang^="zh"] .logo,
-html[lang^="zh"] .mode-btn,
+html[lang^="zh"] .menu-title,
 html[lang^="zh"] .status-bar,
 html[lang^="zh"] .btn,
 html[lang^="zh"] .step-label,
@@ -148,35 +148,6 @@ html[lang^="zh"] .move-history-panel h2 { letter-spacing: 0.02rem; }
   text-transform: uppercase;
 }
 .logo span { font-weight: 300; opacity: 0.7; }
-
-/* ---------- Mode switch ---------- */
-
-.mode-switch {
-  display: flex;
-  padding: 0 12px 10px;
-}
-.mode-btn {
-  flex: 1;
-  min-height: 44px;
-  border: 1px solid var(--border-color);
-  background: transparent;
-  color: var(--dim-text);
-  font-family: var(--font-ui);
-  font-size: 0.8rem;
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 0.1rem;
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s, color 0.15s;
-}
-.mode-btn + .mode-btn { border-left: none; }
-.mode-btn:hover { color: var(--text-color); border-color: var(--border-hover); }
-.mode-btn[aria-pressed="true"] {
-  background: var(--text-color);
-  color: var(--bg-color);
-  border-color: var(--text-color);
-  font-weight: 600;
-}
 
 /* ---------- Status bar ---------- */
 
@@ -214,7 +185,7 @@ html[lang^="zh"] .move-history-panel h2 { letter-spacing: 0.02rem; }
 
 /* ---------- Panels ---------- */
 
-.setup-panel, .move-history-panel, .draw-offer-banner {
+.move-history-panel, .draw-offer-banner {
   background: var(--surface-1);
   border: 1px solid var(--border-color);
   padding: 16px;
@@ -388,22 +359,6 @@ body[data-phase="setup"] .relay-status { display: none; }
 #move-history-list::-webkit-scrollbar-thumb { background: var(--border-bright); }
 #move-history-list::-webkit-scrollbar-track { background: transparent; }
 
-/* ---------- Mode / phase visibility ---------- */
-
-.hotseat-only, .online-only { display: none; }
-body[data-mode="hotseat"] .hotseat-only { display: inline-flex; }
-body[data-mode="online"] .online-only { display: inline-flex; }
-body[data-mode="hotseat"] #online-setup { display: none; }
-body[data-mode="online"] #hotseat-setup { display: none; }
-body[data-phase="active"] .setup-panel,
-body[data-phase="finished"] .setup-panel { display: none; }
-body[data-phase="setup"] .move-history-panel,
-body[data-phase="setup"] .game-controls,
-body[data-phase="setup"] .draw-offer-banner,
-body[data-phase="setup"] .send-panel { display: none; }
-
-.setup-hint.dim { opacity: 0.7; font-size: 0.75rem; }
-
 /* ---------- Icon button (header) ---------- */
 
 .icon-btn {
@@ -506,20 +461,6 @@ body[data-phase="setup"] .send-panel { display: none; }
 
 /* ---------- Games / friends lists ---------- */
 
-.list-panel {
-  background: var(--surface-1);
-  border: 1px solid var(--border-color);
-  padding: 16px;
-}
-.list-panel h2 {
-  font-family: var(--font-ui);
-  font-size: 0.72rem;
-  font-weight: 400;
-  margin: 0 0 10px;
-  color: var(--dim-text);
-  text-transform: uppercase;
-  letter-spacing: 0.15rem;
-}
 .entry-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .entry {
   display: flex;
@@ -578,10 +519,85 @@ body[data-phase="setup"] .send-panel { display: none; }
 }
 .entry-action:hover { color: var(--text-color); border-color: var(--border-hover); }
 .list-empty { margin: 0; color: var(--dimmer-text); font-size: 0.78rem; font-style: italic; }
-.list-panel:not(.has-entries) .entry-list { display: none; }
-.list-panel.has-entries .list-empty { display: none; }
 
-/* Lists and setup only make sense between games. */
-body[data-phase="active"] .list-panel,
-body[data-phase="finished"] .list-panel { display: none; }
-body[data-phase="setup"] .move-history-panel { display: none; }
+
+
+
+/* ---------- Screens ---------- */
+
+.screen { display: none; padding: 0 12px 16px; }
+.screen.active { display: block; }
+
+.screen-title {
+  margin: 0 0 12px;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.12rem;
+  color: var(--dim-text);
+}
+.screen-hint {
+  margin: -6px 0 12px;
+  color: var(--dim-text);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.icon-btn-left { right: auto; left: 12px; }
+
+/* ---------- Main menu ---------- */
+
+.menu-grid { display: flex; flex-direction: column; gap: 8px; }
+
+.menu-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 76px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-color);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+}
+.menu-card:hover { border-color: var(--border-hover); background: var(--surface-4); }
+.menu-card:focus-visible { outline: 1px solid var(--text-color); outline-offset: 2px; }
+.menu-glyph { font-size: 1.5rem; color: var(--dim-text); flex-shrink: 0; width: 28px; text-align: center; }
+.menu-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+.menu-title {
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08rem;
+}
+.menu-sub { font-size: 0.75rem; color: var(--dim-text); }
+.menu-badge {
+  flex-shrink: 0;
+  min-width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 7px;
+  background: var(--text-color);
+  color: var(--bg-color);
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Games and friends lists live directly on their screens now. */
+.entry-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.screen .list-empty { margin: 0; color: var(--dimmer-text); font-size: 0.8rem; font-style: italic; }
+.screen.has-entries .list-empty { display: none; }
+
+/* Mode-specific controls key off the body, which the router keeps in sync. */
+.hotseat-only, .online-only { display: none; }
+body[data-mode="hotseat"] .hotseat-only { display: inline-flex; }
+body[data-mode="online"] .online-only { display: inline-flex; }
+body[data-rotatable="no"] .rotatable-only { display: none !important; }
+body[data-phase="finished"] #game-controls .btn:not(#share-btn) { display: none; }

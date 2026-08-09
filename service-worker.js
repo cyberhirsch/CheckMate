@@ -1,4 +1,4 @@
-const CACHE_NAME = "checkmate-shell-v10";
+const CACHE_NAME = "checkmate-shell-v11";
 const SHELL_FILES = [
   "./",
   "./index.html",
@@ -11,6 +11,7 @@ const SHELL_FILES = [
   "./src/main.js",
   "./src/state.js",
   "./src/ui.js",
+  "./src/screens.js",
   "./src/i18n.js",
   "./src/board-host.js",
   "./src/game-controller.js",

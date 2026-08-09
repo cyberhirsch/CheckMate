@@ -158,7 +158,7 @@ export function setListHandlers(games, friends) {
 }
 
 export function renderGamesList() {
-  const panel = el("games-panel");
+  const panel = el("screen-continue");
   const list = el("games-list");
   const games = listGames();
   list.innerHTML = "";
@@ -221,7 +221,7 @@ export function renderGamesList() {
 }
 
 export function renderFriendsList() {
-  const panel = el("friends-panel");
+  const panel = el("screen-friends");
   const list = el("friends-list");
   const friends = listFriends().sort((a, b) => (b.lastPlayed || 0) - (a.lastPlayed || 0));
   list.innerHTML = "";
@@ -243,7 +243,7 @@ export function renderFriendsList() {
     invite.type = "button";
     invite.className = "entry-action";
     invite.textContent = t("friends.invite");
-    invite.addEventListener("click", () => friendHandlers.invite(f.pubkey));
+    invite.addEventListener("click", () => friendHandlers.invite(f.pubkey, (f.name || "").trim()));
 
     const del = document.createElement("button");
     del.type = "button";

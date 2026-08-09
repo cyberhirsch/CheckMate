@@ -4,7 +4,6 @@ import { GameController } from "./game-controller.js";
 import { HotseatController } from "./hotseat-controller.js";
 import { OnlineController } from "./online-controller.js";
 import { NostrTransport } from "./nostr.js";
-import { wireModeSwitch } from "./mode-controller.js";
 import { renderQR } from "./qr.js";
 import {
   getProfile,
@@ -12,6 +11,9 @@ import {
   hasProfileName,
   getGame,
   deleteGame,
+  removeFriend,
+  listGames,
+  listFriends,
   migrateLegacy,
   activeGameIds,
 } from "./storage.js";
@@ -27,8 +29,11 @@ import {
   setListHandlers,
 } from "./ui.js";
 import { LANGUAGES, detectLanguage, setLanguage, getLanguage, t } from "./i18n.js";
+import { showScreen, getScreen } from "./screens.js";
 
 migrateLegacy();
+
+/* ---------- Core wiring ---------- */
 
 const boardHost = new BoardHost(el("board"), {
   onMoveToken: (token) => gameController.attemptToken(token),
@@ -42,7 +47,7 @@ const gameController = new GameController({
     else if (state.mode === "online") online.afterLocalMove(record);
   },
   onGameOver: () => renderStatusBar(),
-  onPersist: () => renderGamesList(),
+  onPersist: () => refreshMenu(),
 });
 
 const hotseat = new HotseatController(gameController);
@@ -50,10 +55,12 @@ const transport = new NostrTransport();
 
 const online = new OnlineController(gameController, {
   transport,
-  onLinkReady: (link) => {
+  // Sharing is only surfaced when the opponent genuinely needs it: before
+  // pairing, or when the relays could not take the move.
+  onLinkReady: (link, { needsShare }) => {
     el("link-output").value = link;
-    el("send-panel").classList.remove("hidden");
-    el("link-qr").classList.add("hidden");
+    if (needsShare) showSendPanel(link);
+    else el("send-panel").classList.add("hidden");
   },
   onIncomingApplied: () => el("send-panel").classList.add("hidden"),
   onRelayStatus: (status) => {
@@ -61,7 +68,7 @@ const online = new OnlineController(gameController, {
     line.textContent = status ? t("relay." + status) : "";
     line.dataset.state = status || "";
   },
-  onGamesChanged: () => renderGamesList(),
+  onGamesChanged: () => refreshMenu(),
 });
 
 transport.setHandlers({
@@ -69,7 +76,29 @@ transport.setHandlers({
   onInvite: (pubkey, payload) => online.handleInvite(pubkey, payload),
 });
 
-/* ---------- Game picker ---------- */
+async function showSendPanel(link) {
+  const panel = el("send-panel");
+  panel.classList.remove("hidden");
+  const canvas = el("link-qr");
+  const ok = await renderQR(canvas, link);
+  canvas.classList.toggle("hidden", !ok);
+}
+
+/* ---------- Game selection ---------- */
+
+// What the select screen will do with the chosen game.
+let selectIntent = { mode: "hotseat", invitePubkey: null };
+
+function openSelect(mode, invitePubkey = null, friendName = "") {
+  selectIntent = { mode, invitePubkey };
+  el("select-title").textContent = invitePubkey
+    ? t("select.inviteTitle", { name: friendName || t("friends.unnamed") })
+    : mode === "hotseat"
+    ? t("select.titleOffline")
+    : t("select.titleOnline");
+  buildGamePicker();
+  showScreen("select");
+}
 
 function buildGamePicker() {
   const wrap = el("game-picker");
@@ -80,16 +109,77 @@ function buildGamePicker() {
     btn.type = "button";
     btn.className = "game-card";
     btn.dataset.game = id;
-    btn.setAttribute("aria-pressed", String(id === state.gameType));
-    btn.innerHTML = `<span class="game-glyph">${meta.glyph}</span><span class="game-name">${t(meta.titleKey)}</span>`;
-    btn.addEventListener("click", () => {
-      if (state.gameType === id) return;
-      setState({ gameType: id });
-      saveProfile({ gameType: id });
-    });
+    const glyph = document.createElement("span");
+    glyph.className = "game-glyph";
+    glyph.textContent = meta.glyph;
+    const name = document.createElement("span");
+    name.className = "game-name";
+    name.textContent = t(meta.titleKey);
+    btn.append(glyph, name);
+    btn.addEventListener("click", () => startChosenGame(id));
     wrap.appendChild(btn);
   }
 }
+
+async function startChosenGame(gameType) {
+  saveProfile({ gameType });
+  setState({ gameType });
+  if (selectIntent.invitePubkey) {
+    showScreen("game");
+    await online.inviteFriend(selectIntent.invitePubkey, gameType);
+    return;
+  }
+  if (selectIntent.mode === "hotseat") hotseat.start(gameType);
+  else online.startNewGame(gameType);
+  showScreen("game");
+}
+
+/* ---------- Menu ---------- */
+
+function refreshMenu() {
+  const games = listGames();
+  const live = games.filter((g) => g.phase !== "finished");
+  const yourTurn = live.filter((g) => {
+    if (g.mode === "hotseat") return false;
+    const mod = gameModule(g.gameType);
+    const engine = mod && mod.createEngine(g.moves || [], { gameId: g.gameId });
+    if (!engine) return false;
+    return (engine.turn() === "w" ? "white" : "black") === g.localColor;
+  }).length;
+
+  el("menu-continue-sub").textContent = games.length
+    ? t("menu.continueSub", { n: live.length })
+    : t("menu.continueEmpty");
+  const badge = el("menu-badge");
+  badge.textContent = String(yourTurn);
+  badge.classList.toggle("hidden", yourTurn === 0);
+
+  const friends = listFriends();
+  el("menu-friends-sub").textContent = friends.length
+    ? t("menu.friendsSub", { n: friends.length })
+    : t("menu.friendsEmpty");
+
+  renderGamesList();
+  renderFriendsList();
+}
+
+el("menu-offline").addEventListener("click", () => openSelect("hotseat"));
+el("menu-online").addEventListener("click", () => openSelect("online"));
+el("menu-continue").addEventListener("click", () => {
+  renderGamesList();
+  showScreen("continue");
+});
+el("menu-friends").addEventListener("click", () => {
+  renderFriendsList();
+  showScreen("friends");
+});
+
+el("back-btn").addEventListener("click", () => {
+  el("send-panel").classList.add("hidden");
+  history.replaceState(null, "", location.pathname);
+  refreshMenu();
+  showScreen("menu");
+});
 
 /* ---------- Lists ---------- */
 
@@ -101,9 +191,10 @@ function openGame(gameId) {
     const engine = mod && mod.createEngine(rec.moves || [], { gameId: rec.gameId });
     if (!engine) return;
     hotseat.openStored(rec, engine);
-  } else {
-    online.openStored(gameId);
+  } else if (!online.openStored(gameId)) {
+    return;
   }
+  showScreen("game");
 }
 
 setListHandlers(
@@ -112,54 +203,20 @@ setListHandlers(
     remove: (gameId) => {
       if (!window.confirm(t("games.confirmDelete"))) return;
       deleteGame(gameId);
-      renderGamesList();
+      refreshMenu();
     },
   },
   {
-    invite: async (pubkey) => {
-      await online.inviteFriend(pubkey, state.gameType);
-    },
+    invite: (pubkey, name) => openSelect("online", pubkey, name),
     remove: (pubkey) => {
       if (!window.confirm(t("friends.confirmRemove"))) return;
-      import("./storage.js").then((m) => {
-        m.removeFriend(pubkey);
-        renderFriendsList();
-      });
+      removeFriend(pubkey);
+      refreshMenu();
     },
   }
 );
 
-/* ---------- Mode switch ---------- */
-
-wireModeSwitch({
-  onSwitch: () => {
-    el("send-panel").classList.add("hidden");
-    setState({ status: { result: "active", winner: null } });
-  },
-});
-
-/* ---------- Setup controls ---------- */
-
-el("start-hotseat-btn").addEventListener("click", () => hotseat.start());
-el("start-online-btn").addEventListener("click", () => online.startNewGame());
-
-el("rotate-toggle").addEventListener("change", (e) => {
-  setState({ rotateAfterMove: e.target.checked });
-  saveProfile({ rotateAfterMove: e.target.checked });
-});
-el("handoff-toggle").addEventListener("change", (e) => {
-  setState({ showHandoffScreen: e.target.checked });
-  saveProfile({ showHandoffScreen: e.target.checked });
-});
-
 /* ---------- Game controls ---------- */
-
-el("back-btn").addEventListener("click", () => {
-  el("send-panel").classList.add("hidden");
-  history.replaceState(null, "", location.pathname);
-  setState({ phase: "setup" });
-  renderAll();
-});
 
 el("rotate-btn").addEventListener("click", () => hotseat.manualRotate());
 el("undo-btn").addEventListener("click", () => hotseat.undo());
@@ -175,8 +232,9 @@ el("accept-draw-btn").addEventListener("click", () => {
   online.acceptDraw();
 });
 el("reject-draw-btn").addEventListener("click", () => online.declineDraw());
+el("share-btn").addEventListener("click", () => showSendPanel(online.currentLink()));
 
-/* ---------- Share / copy / QR ---------- */
+/* ---------- Share / copy ---------- */
 
 async function copyText(text) {
   try {
@@ -203,30 +261,20 @@ el("share-link-btn").addEventListener("click", async () => {
   }
   await copyText(link);
 });
-el("qr-link-btn").addEventListener("click", async () => {
-  const canvas = el("link-qr");
-  if (!canvas.classList.contains("hidden")) {
-    canvas.classList.add("hidden");
-    return;
-  }
-  const ok = await renderQR(canvas, el("link-output").value);
-  if (!ok) announce(t("msg.qrFailed"));
-});
 
 /* ---------- Settings + welcome ---------- */
 
-function openSettings() {
+el("settings-btn").addEventListener("click", () => {
   el("settings-name").value = getProfile().name;
   el("settings-pubkey").textContent = transport.pubkey || t("settings.identityPending");
   el("settings-modal").classList.remove("hidden");
-}
+});
 
-el("settings-btn").addEventListener("click", openSettings);
 el("settings-close-btn").addEventListener("click", () => {
-  const name = el("settings-name").value.trim().slice(0, 24);
-  saveProfile({ name });
+  saveProfile({ name: el("settings-name").value.trim().slice(0, 24) });
   el("settings-modal").classList.add("hidden");
   renderAll();
+  refreshMenu();
 });
 
 el("welcome-start-btn").addEventListener("click", () => {
@@ -234,6 +282,16 @@ el("welcome-start-btn").addEventListener("click", () => {
   saveProfile({ name: name || t("welcome.defaultName") });
   el("welcome-modal").classList.add("hidden");
   renderAll();
+  refreshMenu();
+});
+
+el("rotate-toggle").addEventListener("change", (e) => {
+  setState({ rotateAfterMove: e.target.checked });
+  saveProfile({ rotateAfterMove: e.target.checked });
+});
+el("handoff-toggle").addEventListener("change", (e) => {
+  setState({ showHandoffScreen: e.target.checked });
+  saveProfile({ showHandoffScreen: e.target.checked });
 });
 
 function buildLanguagePicker() {
@@ -248,7 +306,8 @@ function buildLanguagePicker() {
   sel.value = getLanguage();
   sel.addEventListener("change", () => {
     setLanguage(sel.value);
-    buildGamePicker();
+    if (getScreen() === "select") buildGamePicker();
+    refreshMenu();
     if (gameController.engine) gameController.refreshInteractivity();
   });
 }
@@ -259,6 +318,7 @@ function consumeHash() {
   if (!location.hash || location.hash.length < 2) return false;
   const consumed = online.handleIncoming(location.hash);
   history.replaceState(null, "", location.pathname);
+  if (consumed) showScreen("game");
   return consumed;
 }
 window.addEventListener("hashchange", () => consumeHash());
@@ -267,31 +327,32 @@ window.addEventListener("hashchange", () => consumeHash());
 
 setLanguage(detectLanguage());
 buildLanguagePicker();
-buildGamePicker();
 
 const profile = getProfile();
-setState({ gameType: GAMES[profile.gameType] ? profile.gameType : "chess" });
 const rotateDefault =
   profile.rotateAfterMove === null ? window.matchMedia("(max-width: 767px)").matches : profile.rotateAfterMove;
-setState({ rotateAfterMove: rotateDefault, showHandoffScreen: profile.showHandoffScreen });
+setState({
+  gameType: GAMES[profile.gameType] ? profile.gameType : "chess",
+  rotateAfterMove: rotateDefault,
+  showHandoffScreen: profile.showHandoffScreen,
+});
 el("rotate-toggle").checked = rotateDefault;
 el("handoff-toggle").checked = profile.showHandoffScreen;
 
 initReactiveUI();
+refreshMenu();
+showScreen("menu");
 
 if (!hasProfileName()) {
   el("welcome-modal").classList.remove("hidden");
   el("welcome-name").focus();
 }
 
-// Reconnect to relays for every game that could still receive a move.
 transport.init().then((ok) => {
-  if (!ok) return;
-  transport.syncSubscriptions(activeGameIds());
+  if (ok) transport.syncSubscriptions(activeGameIds());
 });
 
 consumeHash();
-renderAll();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {

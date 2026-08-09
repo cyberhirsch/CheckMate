@@ -30,10 +30,15 @@ Correspondence play where **neither player needs to be online at the same time**
 
 1. Start a game, make your move.
 2. Send the invite link once — over any messenger, or as a QR code.
-3. From then on, moves sync **automatically through public [Nostr](https://nostr.com) relays**. Open the app whenever you like; your opponent's moves are waiting.
-4. If relays are unreachable, the move link still carries the entire game — send it and the game continues.
+3. Your first move presents a QR code and a share/copy link immediately — that one exchange is all the pairing needs.
+4. From then on, moves sync **automatically through public [Nostr](https://nostr.com) relays**, and the share panel disappears. Open the app whenever you like; your opponent's moves are waiting.
+5. If relays are unreachable, the share panel returns — the link still carries the entire game, so sending it keeps things moving.
 
 No server, no accounts, no matchmaking. The relays are free public infrastructure; the link is the fallback that always works.
+
+## Getting around
+
+The app opens on a main menu: **New offline game**, **New online game**, **Continue** (with a badge counting games waiting on you), and **Friends**. Either "new game" leads to a game-selection screen; picking a game starts it straight away.
 
 ## Players, games and friends
 

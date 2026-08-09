@@ -43,7 +43,7 @@
       <span data-i18n="settings.language">Language</span>
       <select id="lang-select" class="field-input"></select>
     </label>
-    <label class="toggle-row rotatable-only">
+    <label class="toggle-row">
       <input type="checkbox" id="rotate-toggle" />
       <span data-i18n="setup.rotateToggle">Rotate board each turn</span>
     </label>
@@ -62,102 +62,128 @@
 
 <div id="app">
   <header class="app-header">
+    <button type="button" id="back-btn" class="icon-btn icon-btn-left hidden" data-i18n-aria="btn.menu">‹</button>
     <h1 class="logo">CHECK<span>MATE</span></h1>
     <button type="button" id="settings-btn" class="icon-btn" data-i18n-aria="settings.title">⚙</button>
   </header>
 
-  <nav class="mode-switch" role="group" aria-label="Game mode">
-    <button type="button" class="mode-btn" data-mode="hotseat" data-i18n="mode.hotseat">Hotseat</button>
-    <button type="button" class="mode-btn" data-mode="online" data-i18n="mode.online">Online</button>
-  </nav>
+  <!-- ============ MENU ============ -->
+  <section id="screen-menu" class="screen">
+    <div class="menu-grid">
+      <button type="button" class="menu-card" id="menu-offline">
+        <span class="menu-glyph">▦</span>
+        <span class="menu-text">
+          <span class="menu-title" data-i18n="menu.newOffline">New offline game</span>
+          <span class="menu-sub" data-i18n="menu.newOfflineSub">Two players, one device</span>
+        </span>
+      </button>
+      <button type="button" class="menu-card" id="menu-online">
+        <span class="menu-glyph">◈</span>
+        <span class="menu-text">
+          <span class="menu-title" data-i18n="menu.newOnline">New online game</span>
+          <span class="menu-sub" data-i18n="menu.newOnlineSub">Play at your own pace</span>
+        </span>
+      </button>
+      <button type="button" class="menu-card" id="menu-continue">
+        <span class="menu-glyph">▶</span>
+        <span class="menu-text">
+          <span class="menu-title" data-i18n="menu.continue">Continue</span>
+          <span class="menu-sub" id="menu-continue-sub"></span>
+        </span>
+        <span class="menu-badge hidden" id="menu-badge"></span>
+      </button>
+      <button type="button" class="menu-card" id="menu-friends">
+        <span class="menu-glyph">◍</span>
+        <span class="menu-text">
+          <span class="menu-title" data-i18n="menu.friends">Friends</span>
+          <span class="menu-sub" id="menu-friends-sub"></span>
+        </span>
+      </button>
+    </div>
+  </section>
 
-  <div id="status-bar" class="status-bar" role="status"></div>
+  <!-- ============ GAME SELECTION ============ -->
+  <section id="screen-select" class="screen">
+    <h2 class="screen-title" id="select-title" data-i18n="select.title">Choose a game</h2>
+    <div id="game-picker" class="game-picker" role="group" data-i18n-aria="select.title"></div>
+  </section>
 
-  <main id="main-area" class="main-area">
-    <section id="board-section" class="board-section">
-      <div id="board-wrap" class="board-wrap">
-        <div id="board" class="board" role="grid" aria-label="Game board"></div>
-        <div id="handoff-screen" class="handoff-screen hidden">
-          <p id="handoff-text"></p>
-          <button type="button" id="handoff-ready-btn" class="btn btn-primary" data-i18n="btn.tapWhenReady">Tap when ready</button>
-        </div>
-        <div id="promotion-modal" class="promotion-modal hidden" role="dialog" aria-modal="true" data-i18n-aria="panel.choose">
-          <div class="promotion-sheet">
-            <h2 data-i18n="panel.choose">Choose</h2>
-            <div class="promotion-choices"></div>
-            <button type="button" class="btn" id="promotion-cancel-btn" data-i18n="btn.cancel">Cancel</button>
+  <!-- ============ CONTINUE ============ -->
+  <section id="screen-continue" class="screen">
+    <h2 class="screen-title" data-i18n="games.title">Your games</h2>
+    <ul id="games-list" class="entry-list"></ul>
+    <p id="games-empty" class="list-empty" data-i18n="games.empty"></p>
+  </section>
+
+  <!-- ============ FRIENDS ============ -->
+  <section id="screen-friends" class="screen">
+    <h2 class="screen-title" data-i18n="friends.title">Friends</h2>
+    <p class="screen-hint" data-i18n="friends.hint"></p>
+    <ul id="friends-list" class="entry-list"></ul>
+    <p id="friends-empty" class="list-empty" data-i18n="friends.empty"></p>
+  </section>
+
+  <!-- ============ GAME ============ -->
+  <section id="screen-game" class="screen">
+    <div id="status-bar" class="status-bar" role="status"></div>
+
+    <div class="main-area">
+      <div class="board-section">
+        <div id="board-wrap" class="board-wrap">
+          <div id="board" class="board" role="grid" aria-label="Game board"></div>
+          <div id="handoff-screen" class="handoff-screen hidden">
+            <p id="handoff-text"></p>
+            <button type="button" id="handoff-ready-btn" class="btn btn-primary" data-i18n="btn.tapWhenReady">Tap when ready</button>
+          </div>
+          <div id="promotion-modal" class="promotion-modal hidden" role="dialog" aria-modal="true" data-i18n-aria="panel.choose">
+            <div class="promotion-sheet">
+              <h2 data-i18n="panel.choose">Choose</h2>
+              <div class="promotion-choices"></div>
+              <button type="button" class="btn" id="promotion-cancel-btn" data-i18n="btn.cancel">Cancel</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div id="relay-status" class="relay-status online-only" role="status"></div>
+        <div id="relay-status" class="relay-status online-only" role="status"></div>
 
-      <div id="send-panel" class="send-panel hidden">
-        <h3 class="step-label" data-i18n="panel.sendMove">Send your move</h3>
-        <div class="btn-row">
-          <button type="button" id="share-link-btn" class="btn btn-primary" data-i18n="btn.share">Share</button>
-          <button type="button" id="copy-link-btn" class="btn" data-i18n="btn.copyLink">Copy Link</button>
-          <button type="button" id="qr-link-btn" class="btn" data-i18n="btn.qr">QR</button>
-        </div>
-        <canvas id="link-qr" class="qr-canvas hidden"></canvas>
-        <textarea id="link-output" readonly rows="2" aria-label="Move link"></textarea>
-      </div>
-
-      <div id="game-controls" class="game-controls">
-        <button type="button" id="back-btn" class="btn" data-i18n="btn.back">Back</button>
-        <button type="button" id="rotate-btn" class="btn hotseat-only rotatable-only" data-i18n="btn.rotate">Rotate</button>
-        <button type="button" id="undo-btn" class="btn hotseat-only" data-i18n="btn.undo">Undo</button>
-        <button type="button" id="resign-btn" class="btn" data-i18n="btn.resign">Resign</button>
-        <button type="button" id="draw-btn" class="btn hotseat-only" data-i18n="btn.draw">Draw</button>
-        <button type="button" id="offer-draw-btn" class="btn online-only" data-i18n="btn.offerDraw">Offer Draw</button>
-      </div>
-    </section>
-
-    <aside id="info-panel" class="info-panel">
-      <div id="setup-panel" class="setup-panel">
-        <div id="game-picker" class="game-picker" role="group" aria-label="Choose a game"></div>
-
-        <div id="hotseat-setup" class="setup-block">
-          <p class="setup-hint" data-i18n="setup.hotseatHint"></p>
-          <button type="button" id="start-hotseat-btn" class="btn btn-primary btn-lg" data-i18n="setup.startGame">Start Game</button>
+        <!-- Shown when the opponent actually needs the link: first move, or relay failure -->
+        <div id="send-panel" class="send-panel hidden">
+          <h3 class="step-label" data-i18n="panel.sendMove">Send your move</h3>
+          <p class="sheet-hint" id="send-hint" data-i18n="share.scanHint"></p>
+          <canvas id="link-qr" class="qr-canvas"></canvas>
+          <div class="btn-row">
+            <button type="button" id="share-link-btn" class="btn btn-primary" data-i18n="btn.share">Share</button>
+            <button type="button" id="copy-link-btn" class="btn" data-i18n="btn.copyLink">Copy</button>
+          </div>
+          <textarea id="link-output" readonly rows="2" aria-label="Move link"></textarea>
         </div>
 
-        <div id="online-setup" class="setup-block">
-          <p class="setup-hint" data-i18n="setup.onlineHint"></p>
-          <button type="button" id="start-online-btn" class="btn btn-primary btn-lg">
-            <span data-i18n="setup.newGame">New Game</span>
-            <span class="btn-sub" data-i18n="setup.youMoveFirst">You move first</span>
-          </button>
-          <p class="setup-hint dim" data-i18n="setup.receivedLink"></p>
+        <div id="game-controls" class="game-controls">
+          <button type="button" id="rotate-btn" class="btn hotseat-only rotatable-only" data-i18n="btn.rotate">Rotate</button>
+          <button type="button" id="undo-btn" class="btn hotseat-only" data-i18n="btn.undo">Undo</button>
+          <button type="button" id="resign-btn" class="btn" data-i18n="btn.resign">Resign</button>
+          <button type="button" id="draw-btn" class="btn hotseat-only" data-i18n="btn.draw">Draw</button>
+          <button type="button" id="offer-draw-btn" class="btn online-only" data-i18n="btn.offerDraw">Offer Draw</button>
+          <button type="button" id="share-btn" class="btn online-only" data-i18n="btn.shareGame">Share</button>
         </div>
       </div>
 
-      <div id="games-panel" class="list-panel">
-        <h2 data-i18n="games.title">Your games</h2>
-        <ul id="games-list" class="entry-list"></ul>
-        <p id="games-empty" class="list-empty" data-i18n="games.empty"></p>
-      </div>
-
-      <div id="friends-panel" class="list-panel">
-        <h2 data-i18n="friends.title">Friends</h2>
-        <ul id="friends-list" class="entry-list"></ul>
-        <p id="friends-empty" class="list-empty" data-i18n="friends.empty"></p>
-      </div>
-
-      <div id="draw-offer-banner" class="draw-offer-banner hidden">
-        <span data-i18n="draw.offered">Opponent offers a draw</span>
-        <div class="btn-row">
-          <button type="button" id="accept-draw-btn" class="btn btn-primary" data-i18n="btn.accept">Accept</button>
-          <button type="button" id="reject-draw-btn" class="btn" data-i18n="btn.decline">Decline</button>
+      <aside class="info-panel">
+        <div id="draw-offer-banner" class="draw-offer-banner hidden">
+          <span data-i18n="draw.offered">Opponent offers a draw</span>
+          <div class="btn-row">
+            <button type="button" id="accept-draw-btn" class="btn btn-primary" data-i18n="btn.accept">Accept</button>
+            <button type="button" id="reject-draw-btn" class="btn" data-i18n="btn.decline">Decline</button>
+          </div>
         </div>
-      </div>
 
-      <div id="move-history-panel" class="move-history-panel">
-        <h2 data-i18n="panel.moves">Moves</h2>
-        <ol id="move-history-list"></ol>
-      </div>
-    </aside>
-  </main>
+        <div class="move-history-panel">
+          <h2 data-i18n="panel.moves">Moves</h2>
+          <ol id="move-history-list"></ol>
+        </div>
+      </aside>
+    </div>
+  </section>
 </div>
 
 <script type="module" src="src/main.js"></script>
