@@ -1,0 +1,17 @@
+{
+  "name": "checkmate",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Serverless two-player game bundle, played by link or Nostr relay sync",
+  "scripts": {
+    "serve": "http-server -p 8080 -c-1",
+    "build:www": "node scripts/build-www.js",
+    "cap:sync": "npm run build:www && npx cap sync android"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/core": "^8.5.0"
+  }
+}

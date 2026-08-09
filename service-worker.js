@@ -1,4 +1,4 @@
-const CACHE_NAME = "checkmate-shell-v19";
+const CACHE_NAME = "checkmate-shell-v20";
 const SHELL_FILES = [
   "./",
   "./index.html",
@@ -24,6 +24,11 @@ const SHELL_FILES = [
   "./src/qr.js",
   "./src/storage.js",
   "./src/vendor/chess.js",
+  "./src/vendor/nostr-tools.js",
+  "./src/vendor/qrcode.js",
+  "./src/vendor/jsqr.js",
+  "./src/vendor/dijkstrajs.js",
+  "./src/vendor/encode-utf8.js",
   "./src/games/registry.js",
   "./src/games/grid-view.js",
   "./src/games/chess.js",
@@ -64,7 +69,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   const url = new URL(event.request.url);
-  if (url.origin !== self.location.origin) return; // CDN (qr, nostr-tools) hits network directly
+  if (url.origin !== self.location.origin) return; // relay/font requests hit network directly
 
   event.respondWith(
     caches.match(event.request).then((cached) => {

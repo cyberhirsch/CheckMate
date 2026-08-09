@@ -3,14 +3,14 @@ let jsQRMod = null;
 
 async function loadEncoder() {
   if (!qrEncodeMod) {
-    qrEncodeMod = await import("https://esm.sh/qrcode@1.5.3");
+    qrEncodeMod = await import("./vendor/qrcode.js");
   }
   return qrEncodeMod;
 }
 
 async function loadDecoder() {
   if (!jsQRMod) {
-    jsQRMod = (await import("https://esm.sh/jsqr@1.4.0")).default;
+    jsQRMod = (await import("./vendor/jsqr.js")).default;
   }
   return jsQRMod;
 }

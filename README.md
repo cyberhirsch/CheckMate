@@ -73,8 +73,9 @@ Adding a language means adding one block to `STRINGS` in `src/i18n.js` (122 keys
 
 - Plain ES modules, no build step, no framework.
 - [chess.js](https://github.com/jhlywa/chess.js) vendored locally; the other 12 engines are self-contained.
-- [nostr-tools](https://github.com/nbd-wtf/nostr-tools) for relay transport, [qrcode](https://github.com/soldair/node-qrcode) for QR links.
+- [nostr-tools](https://github.com/nbd-wtf/nostr-tools) for relay transport, [qrcode](https://github.com/soldair/node-qrcode)/[jsqr](https://github.com/cozmo/jsQR) for QR links — all vendored locally in `src/vendor/`, no CDN fetches at runtime.
 - Service worker + web app manifest: installable, offline-capable.
+- Android app via [Capacitor](https://capacitorjs.com) — bundles the same code locally, no address bar. See `android/ANDROID.md`.
 - Design: dark monochrome instrument panel — Inter / Outfit / JetBrains Mono, pure black surfaces, hairline borders, no accent color.
 
 ## Adding a game
@@ -120,7 +121,7 @@ src/
   link-codec.js         URL hash encode / decode / validate
   nostr.js              signed relay transport
   ui.js, mode-controller.js, storage.js, qr.js
-  vendor/chess.js       vendored dependency
+  vendor/               vendored deps: chess.js, nostr-tools, qrcode, jsqr
   games/
     registry.js         game registration
     grid-view.js        shared square-grid renderer

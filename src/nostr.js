@@ -27,7 +27,7 @@ const SECRET_KEY_STORAGE = "checkmate:nostr-sk";
 let tools = null;
 async function loadTools() {
   if (!tools) {
-    tools = await import("https://esm.sh/nostr-tools@2.7.2");
+    tools = await import("./vendor/nostr-tools.js");
   }
   return tools;
 }

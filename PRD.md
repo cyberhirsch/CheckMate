@@ -187,7 +187,9 @@ Hash commitment: publish `sha256(secret + salt)` up front, reveal at game end; c
 | **Card games** (shuffled decks) | same problem plus hidden-hand state; the trust machinery outweighs the game |
 | **Real-time games** | violates the async premise entirely |
 
-**Non-game roadmap:** vendor remaining CDN libs (qrcode, nostr-tools) → auto-open share sheet after move (toggle) + auto-copy fallback → per-game rules blurb in setup → store wrappers (TWA for Google Play; Capacitor for iOS, $25 one-time / $99-yr fees; all licenses BSD/MIT/Apache, commercial-safe).
+**Non-game roadmap:** ~~vendor remaining CDN libs (qrcode, nostr-tools)~~ done — see `src/vendor/` — → auto-open share sheet after move (toggle) + auto-copy fallback → per-game rules blurb in setup → iOS store wrapper (not pursued — no Apple developer account; Android-only distribution via sideload for now).
+
+**Android packaging:** initially a Trusted Web Activity (Bubblewrap) wrapping the live site, but that showed a browser address bar without a `.well-known/assetlinks.json` on a separate `cyberhirsch.github.io` origin. Switched to [Capacitor](https://capacitorjs.com/): the site is bundled into the APK and loads from disk in a WebView, no address bar, no origin-verification step. Trade-off: app updates need a rebuild + reinstall instead of an instant site deploy. Online play is unaffected either way — it always talks to the public Nostr relays over the internet. See `android/ANDROID.md`.
 
 ## 9. Acceptance criteria (v2 — all currently met)
 

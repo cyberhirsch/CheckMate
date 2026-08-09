@@ -1,86 +1,78 @@
-# Android packaging (Trusted Web Activity)
+# Android packaging (Capacitor)
 
-The Play Store build wraps the deployed PWA in a Trusted Web Activity —
-Google's supported way to ship a web app on Play. The app *is* the website;
-updates ship by deploying the site, with no store review needed unless the
-wrapper itself changes.
+The Android app is a [Capacitor](https://capacitorjs.com) wrapper: the game
+code (HTML/CSS/JS) is copied into the app at build time and loads from disk
+in an embedded WebView, not from the internet. There's no address bar —
+Capacitor apps are native WebView containers, not browser tabs, so unlike a
+Trusted Web Activity there's no Digital Asset Links step to hide one.
+
+Online multiplayer is unaffected: the app still opens WebSocket connections
+to the public Nostr relays over the internet, exactly like the website. Only
+the *code* is now bundled instead of fetched — offline hotseat play needs
+zero network access, online async play needs internet to reach relays either
+way.
+
+**Trade-off**: site deploys no longer reach the app instantly. A code change
+needs a rebuild + reinstall (or a Play Store update once published) to reach
+users on Android. The website itself still updates live for everyone using it
+in a browser.
 
 ## What lives here
 
-| File | Purpose |
+| Path | Purpose |
 |---|---|
-| `twa-manifest.json` | Bubblewrap config — package id, colors, icons, signing settings |
-| `assetlinks.json` | Digital Asset Links — proves the app and site belong together |
-| `checkmate.keystore` | Signing key (**not in git** — back it up privately) |
-| `keystore-secrets.txt` | Keystore passwords (**not in git**) |
-| `app/`, `gradle*` | Generated Android project (regenerate any time with `bubblewrap update`) |
+| `capacitor.config.json` (repo root) | App id, name, web asset dir |
+| `scripts/build-www.js` (repo root) | Stages the site into `www/` before sync |
+| `android/app/checkmate.keystore` | Signing key (**not in git** — back it up privately) |
+| `android/app/src/main/java/.../MainActivity.java` | Grants the WebView camera access for the QR scanner |
+| `android/app/build/outputs/apk/release/app-release.apk` | Build output |
+
+`android-twa-old/` at the repo root is the previous Trusted Web Activity
+project, kept locally for reference only (not in git, not needed anymore).
 
 ## Build
 
 ```bash
+npm run build:www        # stage index.html, styles/, src/, assets/ into www/
+npx cap sync android      # copy www/ into the Android project, sync plugins
+```
+
+Then build the signed release APK with Gradle. On Windows, `gradlew.bat`
+needs `JAVA_HOME` pointed at a **JDK 21** (Capacitor 8 requires it — JDK 17
+fails with `invalid source release: 21`) and `ANDROID_HOME` at the SDK:
+
+```powershell
+$env:JAVA_HOME = "<path to a JDK 21>"
+$env:ANDROID_HOME = "C:\Users\<you>\AppData\Local\Android\Sdk"
+$env:CHECKMATE_KEYSTORE_PASS = "<keystore password>"
 cd android
-npx @bubblewrap/cli update --skipVersionUpgrade   # regenerate project from twa-manifest.json
-npx @bubblewrap/cli build                          # produces app-release-signed.apk + .aab
+.\gradlew.bat assembleRelease
 ```
 
-Bubblewrap reads JDK/SDK paths from `~/.bubblewrap/config.json` and asks for
-the keystore passwords (in `keystore-secrets.txt`). For a non-interactive
-build, export them first:
+Output: `android/app/build/outputs/apk/release/app-release.apk`, already
+signed (the `signingConfigs.release` block in `android/app/build.gradle`
+reads the password from `CHECKMATE_KEYSTORE_PASS`). Verify with:
 
 ```bash
-export BUBBLEWRAP_KEYSTORE_PASSWORD=... BUBBLEWRAP_KEY_PASSWORD=...
+apksigner verify --print-certs app-release.apk
 ```
 
-Output: `app-release-signed.apk` (sideload/test) and `app-release-bundle.aab`
-(what Play Console wants).
+## Icons and splash screens
 
-Two Windows quirks, both worked around in this setup: Bubblewrap's SDK check
-wants the *command-line tools* layout, so `~/.bubblewrap/android_sdk` holds
-its own mini-SDK (licenses pre-accepted in `licenses/`); and its apksigner
-invocation breaks on the space in `C:\Program Files`, so if `build` fails at
-signing, sign manually:
-
-```bash
-java -jar $ANDROID_HOME/build-tools/<ver>/lib/apksigner.jar sign   --ks checkmate.keystore --ks-key-alias checkmate   --ks-pass pass:<storepass> --key-pass pass:<keypass>   --out app-release-signed.apk app-release-unsigned-aligned.apk
-./gradlew.bat bundleRelease
-jarsigner -keystore checkmate.keystore -storepass <storepass>   -signedjar app-release-bundle.aab   app/build/outputs/bundle/release/app-release.aab checkmate
-```
-
-## Digital Asset Links — the one manual step
-
-Without this, the app opens with a browser URL bar. The file must be served
-from the **origin root**, and GitHub Pages project sites can't do that from
-this repo:
-
-- Required URL: `https://cyberhirsch.github.io/.well-known/assetlinks.json`
-- That path belongs to the **`cyberhirsch.github.io` repo** (the user site),
-  not to `CheckMate`. Create that repo if needed, add
-  `.well-known/assetlinks.json` with the contents of `assetlinks.json` here.
-- Verify with: `https://digitalassetlinks.googleapis.com/v1/statements:list?source.web.site=https://cyberhirsch.github.io&relation=delegate_permission/common.handle_all_urls`
-
-If you later add more apps/keys, the file is a JSON array — append entries.
-
-## Play Console checklist
-
-1. One-time developer registration: $25 at play.google.com/console.
-2. Create app → upload `app-release-bundle.aab` to a closed test track first.
-3. Store listing needs: title, short + full description, at least 2 phone
-   screenshots, a 512×512 icon (use `assets/icon-512.png`), a 1024×500
-   feature graphic, privacy policy URL, content rating questionnaire,
-   data-safety form (truthfully: no accounts, no data collected — game state
-   in localStorage, signed moves via public Nostr relays).
-4. Google requires ~20 testers for 14 days on new personal accounts before
-   production release — plan for the closed-testing phase.
-
-## Versioning
-
-Bump `appVersionCode` (integer, must always increase) and `appVersionName`
-in `twa-manifest.json`, then `update` + `build` again. Only needed when the
-wrapper changes — site deploys reach the app instantly.
+Generated from `resources/icon.png` and `resources/icon-foreground.png` via
+`npx capacitor-assets generate --android`. Re-run that after changing either
+source image.
 
 ## Keystore rules
 
-- **Same key forever**: Play identifies the app by signature. A lost key
-  means a new package id and a fresh listing (or Play App Signing recovery,
-  if enrolled — do enroll when uploading the first AAB).
-- Never commit `checkmate.keystore` or the passwords.
+Same as before — **same key forever**. A lost key means a new package id.
+`android/app/checkmate.keystore` is gitignored; keep a private backup (see
+`android-keystore-backup/` alongside the repo, also gitignored).
+
+## Publishing to Play Store (not done yet)
+
+Same checklist as any Android app: developer registration, `.aab` upload
+(`.\gradlew.bat bundleRelease`), store listing assets, content rating,
+data-safety form (truthfully: no accounts, no data collected — game state in
+localStorage, signed moves via public Nostr relays). Not pursued so far,
+Android-only distribution (sideload) is the current target.
