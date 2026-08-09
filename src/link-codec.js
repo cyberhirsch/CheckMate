@@ -68,6 +68,28 @@ export function replayMoves(gameType, moves, gameId) {
   return { ok: true, engine };
 }
 
+// Friend links carry no game — just an identity to add. Kept structurally
+// separate from game links (different params, no gameId) so the two can
+// never be confused when parsing an incoming hash.
+export function encodeFriendLink({ pubkey, name }) {
+  const params = new URLSearchParams();
+  params.set("f", pubkey);
+  if (name) params.set("n", name.slice(0, 32));
+  const base = location.origin + location.pathname;
+  return `${base}#${params.toString()}`;
+}
+
+export function parseFriendHash(hash) {
+  const raw = (hash || "").replace(/^#/, "");
+  if (!raw) return null;
+  const params = new URLSearchParams(raw);
+  const pubkey = params.get("f");
+  if (!pubkey) return null; // not a friend link
+  if (!/^[0-9a-f]{64}$/.test(pubkey)) return { ok: false, reason: "bad-pubkey" };
+  const name = (params.get("n") || "").slice(0, 32);
+  return { ok: true, pubkey, name };
+}
+
 // An incoming link is valid against local history when it is the same game
 // extended by zero or more moves (zero = reopening an already-seen link).
 export function extendsHistory(localMoves, incomingMoves) {

@@ -75,6 +75,25 @@
   </div>
 </div>
 
+<!-- Add a friend: share your own invite, or paste theirs -->
+<div id="add-friend-modal" class="sheet-modal hidden" role="dialog" aria-modal="true" data-i18n-aria="friends.addButton">
+  <div class="sheet sheet-compact">
+    <h2 data-i18n="friends.addButton">Add Friend</h2>
+    <p class="sheet-hint" data-i18n="addFriend.yourLinkHint"></p>
+    <canvas id="friend-qr" class="qr-canvas"></canvas>
+    <div class="btn-row">
+      <button type="button" id="friend-share-btn" class="btn btn-primary" data-i18n="btn.share">Share</button>
+      <button type="button" id="friend-copy-btn" class="btn" data-i18n="btn.copyLink">Copy</button>
+    </div>
+    <label class="field">
+      <span data-i18n="addFriend.pasteLabel">Or paste their link</span>
+      <input type="text" id="friend-paste-input" data-i18n-placeholder="addFriend.pastePlaceholder" />
+    </label>
+    <button type="button" id="friend-add-btn" class="btn btn-primary" data-i18n="addFriend.addBtn">Add</button>
+    <button type="button" id="friend-close-btn" class="btn" data-i18n="btn.done">Done</button>
+  </div>
+</div>
+
 <div id="app">
   <header class="app-header">
     <button type="button" id="back-btn" class="icon-btn icon-btn-left hidden" data-i18n-aria="btn.menu">‹</button>
@@ -134,6 +153,7 @@
   <section id="screen-friends" class="screen">
     <h2 class="screen-title" data-i18n="friends.title">Friends</h2>
     <p class="screen-hint" data-i18n="friends.hint"></p>
+    <button type="button" id="add-friend-btn" class="btn btn-primary btn-lg" data-i18n="friends.addButton">Add Friend</button>
     <ul id="friends-list" class="entry-list"></ul>
     <p id="friends-empty" class="list-empty" data-i18n="friends.empty"></p>
   </section>

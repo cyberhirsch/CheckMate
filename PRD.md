@@ -100,7 +100,7 @@ Language is auto-detected from `navigator.languages` on first visit, then persis
 
 **One relay subscription** covers every unfinished online game plus a personal inbox tag `checkmate:inbox:<pubkey>`. Background games update in storage as their moves arrive, so the list shows "your turn" without opening them.
 
-**Friends** are auto-recorded from any paired opponent (link or relay). A friend invite is published to their inbox tag, so repeat opponents never exchange a link again — the one genuine remaining use of links is meeting someone new, plus recovery.
+**Friends** are auto-recorded from any paired opponent (link or relay), and can also be added directly: the friends screen has an Add Friend sheet showing your own friend link as QR + Share/Copy, and a paste field accepting a friend link or bare pubkey. Friend links use a separate `#f=<pubkey>&n=<name>` format — structurally distinct from game links so the two can't be confused — and opening one adds the sender and lands on the friends screen. Self-add and duplicates are rejected. A friend invite is published to their inbox tag, so repeat opponents never exchange a link again — the remaining uses of links are meeting someone new, plus recovery.
 
 ## 6c. Navigation
 

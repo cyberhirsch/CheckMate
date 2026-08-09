@@ -11,6 +11,7 @@ import {
   hasProfileName,
   getGame,
   deleteGame,
+  addFriend,
   removeFriend,
   listGames,
   listFriends,
@@ -30,6 +31,7 @@ import {
 } from "./ui.js";
 import { LANGUAGES, detectLanguage, setLanguage, getLanguage, t } from "./i18n.js";
 import { showScreen, getScreen } from "./screens.js";
+import { encodeFriendLink, parseFriendHash } from "./link-codec.js";
 
 migrateLegacy();
 
@@ -298,6 +300,62 @@ el("handoff-toggle").addEventListener("change", (e) => {
   saveProfile({ showHandoffScreen: e.target.checked });
 });
 
+/* ---------- Add friend ---------- */
+
+function myFriendLink() {
+  return encodeFriendLink({ pubkey: transport.pubkey, name: getProfile().name });
+}
+
+async function openAddFriendModal() {
+  el("friend-paste-input").value = "";
+  el("add-friend-modal").classList.remove("hidden");
+  if (!transport.available) await transport.init();
+  const link = myFriendLink();
+  const canvas = el("friend-qr");
+  const ok = await renderQR(canvas, link);
+  canvas.classList.toggle("hidden", !ok);
+  canvas.dataset.link = link;
+}
+
+function closeAddFriendModal() {
+  el("add-friend-modal").classList.add("hidden");
+}
+
+function addFriendFromText(raw) {
+  const text = raw.trim();
+  if (!text) return;
+  // Accept a full link or a bare pubkey pasted straight from someone's ID.
+  const hash = text.includes("#") ? text.slice(text.indexOf("#")) : `#f=${text}`;
+  const parsed = parseFriendHash(hash);
+  if (!parsed || !parsed.ok) {
+    announce(t("addFriend.invalid"));
+    return;
+  }
+  if (transport.pubkey && parsed.pubkey === transport.pubkey) {
+    announce(t("addFriend.self"));
+    return;
+  }
+  addFriend(parsed.pubkey, parsed.name);
+  announce(t("addFriend.added", { name: parsed.name || t("friends.unnamed") }));
+  el("friend-paste-input").value = "";
+  refreshMenu();
+}
+
+el("add-friend-btn").addEventListener("click", openAddFriendModal);
+el("friend-close-btn").addEventListener("click", closeAddFriendModal);
+el("friend-add-btn").addEventListener("click", () => addFriendFromText(el("friend-paste-input").value));
+el("friend-copy-btn").addEventListener("click", () => copyText(el("friend-qr").dataset.link || myFriendLink()));
+el("friend-share-btn").addEventListener("click", async () => {
+  const link = el("friend-qr").dataset.link || myFriendLink();
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: t("addFriend.shareTitle"), url: link });
+      return;
+    } catch { /* cancelled */ }
+  }
+  await copyText(link);
+});
+
 function buildLanguagePicker() {
   const sel = el("lang-select");
   sel.innerHTML = "";
@@ -320,6 +378,21 @@ function buildLanguagePicker() {
 
 function consumeHash() {
   if (!location.hash || location.hash.length < 2) return false;
+  const friendLink = parseFriendHash(location.hash);
+  if (friendLink) {
+    history.replaceState(null, "", location.pathname);
+    if (!friendLink.ok) {
+      announce(t("addFriend.invalid"));
+      return false;
+    }
+    if (transport.pubkey && friendLink.pubkey === transport.pubkey) return false;
+    addFriend(friendLink.pubkey, friendLink.name);
+    announce(t("addFriend.added", { name: friendLink.name || t("friends.unnamed") }));
+    refreshMenu();
+    renderFriendsList();
+    showScreen("friends");
+    return true;
+  }
   const consumed = online.handleIncoming(location.hash);
   history.replaceState(null, "", location.pathname);
   if (consumed) showScreen("game");
