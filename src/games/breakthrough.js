@@ -2,9 +2,9 @@ import { makeGridView, pieceHTML } from "./grid-view.js";
 
 export const meta = {
   id: "breakthrough",
-  title: "Breakthrough",
+  titleKey: "game.breakthrough",
   glyph: "♙",
-  players: { w: "White", b: "Black" },
+  players: { w: "player.white", b: "player.black" },
   rotatable: true,
   moveRe: /^[a-h][1-8][a-h][1-8]$/,
 };
@@ -61,11 +61,11 @@ export function createEngine(tokens = []) {
     describe: (t) => `${t.slice(0, 2)}→${t.slice(2)}`,
     status() {
       for (let f = 0; f < 8; f++) {
-        if (cells[7 * 8 + f] === "w") return { result: "win", winner: "w", note: "Reached the last rank" };
-        if (cells[0 * 8 + f] === "b") return { result: "win", winner: "b", note: "Reached the last rank" };
+        if (cells[7 * 8 + f] === "w") return { result: "win", winner: "w", note: { k: "note.lastRank" } };
+        if (cells[0 * 8 + f] === "b") return { result: "win", winner: "b", note: { k: "note.lastRank" } };
       }
-      if (!cells.includes("w")) return { result: "win", winner: "b", note: "All pieces captured" };
-      if (!cells.includes("b")) return { result: "win", winner: "w", note: "All pieces captured" };
+      if (!cells.includes("w")) return { result: "win", winner: "b", note: { k: "note.allCaptured" } };
+      if (!cells.includes("b")) return { result: "win", winner: "w", note: { k: "note.allCaptured" } };
       return { result: "active" };
     },
   };

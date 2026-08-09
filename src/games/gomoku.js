@@ -2,9 +2,9 @@ import { makeGridView, pieceHTML } from "./grid-view.js";
 
 export const meta = {
   id: "gomoku",
-  title: "Gomoku",
+  titleKey: "game.gomoku",
   glyph: "✻",
-  players: { w: "Black", b: "White" }, // black stones move first
+  players: { w: "player.black", b: "player.white" },
   rotatable: false,
   moveRe: /^[a-o](1[0-5]|[1-9])$/,
 };
@@ -61,8 +61,8 @@ export function createEngine(tokens = []) {
     },
     describe: (t) => t,
     status() {
-      if (won) return { result: "win", winner: won, note: "Five in a row" };
-      if (cells.every(Boolean)) return { result: "draw", note: "Board full" };
+      if (won) return { result: "win", winner: won, note: { k: "note.fiveInRow" } };
+      if (cells.every(Boolean)) return { result: "draw", note: { k: "note.boardFull" } };
       return { result: "active" };
     },
   };

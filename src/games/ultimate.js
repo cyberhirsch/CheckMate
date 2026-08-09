@@ -3,9 +3,9 @@ import { lineWinner } from "./tictactoe.js";
 
 export const meta = {
   id: "uttt",
-  title: "Ultimate TTT",
+  titleKey: "game.uttt",
   glyph: "⬚",
-  players: { w: "X", b: "O" },
+  players: { w: "player.x", b: "player.o" },
   rotatable: false,
   moveRe: /^[0-8][0-8]$/,
 };
@@ -64,12 +64,12 @@ export function createEngine(tokens = []) {
     status() {
       const macroCells = macro.map((v) => (v === "full" ? null : v));
       const w = lineWinner(macroCells);
-      if (w) return { result: "win", winner: w, note: "Three boards in a row" };
+      if (w) return { result: "win", winner: w, note: { k: "note.threeBoards" } };
       if (macro.every(Boolean)) {
         const ws = macro.filter((v) => v === "w").length;
         const bs = macro.filter((v) => v === "b").length;
-        if (ws !== bs) return { result: "win", winner: ws > bs ? "w" : "b", note: "Most boards" };
-        return { result: "draw", note: "Equal boards" };
+        if (ws !== bs) return { result: "win", winner: ws > bs ? "w" : "b", note: { k: "note.mostBoards" } };
+        return { result: "draw", note: { k: "note.equalBoards" } };
       }
       return { result: "active" };
     },

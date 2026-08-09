@@ -4,6 +4,8 @@ A serverless two-player game bundle. **13 turn-based games**, one static web app
 
 **Play offline** on one device, or **play online** where moves sync automatically through public relays — with a shareable link as the universal fallback.
 
+Available in **English, Deutsch, Türkçe, Romeika, Italiano and 中文**.
+
 ## The games
 
 | | Game | | Game |
@@ -41,6 +43,14 @@ No server, no accounts, no matchmaking. The relays are free public infrastructur
 - Game IDs and keys come from `crypto.getRandomValues()`.
 - The Royal Game of Ur derives its dice deterministically from `hash(gameId + move history)`, so both clients compute identical rolls with no extra messages. (Casual-fair — see the PRD for the caveat.)
 
+## Languages
+
+The interface, game names, player names and every status message are translated into six languages, picked from the selector in the header (auto-detected from the browser on first visit, then remembered).
+
+**Romeika** deserves a note: it's the Pontic Greek variety still spoken around Trabzon and Of in north-east Türkiye — endangered, overwhelmingly oral, and without a standardized written form. Its speakers are literate in Turkish, so it's written here in Turkish orthography rather than Greek script, which is how speakers themselves write it when they write it at all. The strings in `src/i18n.js` are a best effort and **corrections from native speakers are very welcome** — open an issue or a PR.
+
+Adding a language means adding one block to `STRINGS` in `src/i18n.js` (122 keys) and one entry to `LANGUAGES`. Missing keys fall back to English rather than breaking.
+
 ## Tech
 
 - Plain ES modules, no build step, no framework.
@@ -54,7 +64,7 @@ No server, no accounts, no matchmaking. The relays are free public infrastructur
 Games plug into a shared shell (modes, transports, persistence, history). A game module exports:
 
 ```js
-export const meta = { id, title, glyph, players, rotatable, moveRe };
+export const meta = { id, titleKey, glyph, players, rotatable, moveRe };
 export function createEngine(tokens, { gameId }) { … }   // null if any token is illegal
 export function createView(container) { … }              // render + onTap
 export function tapReducer(engine, selection, cellId) { … }  // tap → move | select | choose

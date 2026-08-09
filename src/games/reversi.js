@@ -2,9 +2,9 @@ import { makeGridView, pieceHTML } from "./grid-view.js";
 
 export const meta = {
   id: "reversi",
-  title: "Reversi",
+  titleKey: "game.reversi",
   glyph: "◐",
-  players: { w: "White", b: "Black" },
+  players: { w: "player.white", b: "player.black" },
   rotatable: false,
   moveRe: /^[a-h][1-8]$/,
 };

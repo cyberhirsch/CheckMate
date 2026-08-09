@@ -2,9 +2,9 @@ import { pieceHTML } from "./grid-view.js";
 
 export const meta = {
   id: "mancala",
-  title: "Mancala",
+  titleKey: "game.mancala",
   glyph: "◔",
-  players: { w: "South", b: "North" },
+  players: { w: "player.south", b: "player.north" },
   rotatable: false,
   freeAspect: true,
   moveRe: /^[0-5]$/,
@@ -86,7 +86,7 @@ export function createEngine(tokens = []) {
       for (let i = 0; i < 6; i++) if (pits[base + i] > 0) out.push(String(i));
       return out;
     },
-    describe: (t) => `pit ${Number(t) + 1}`,
+    describe: (t) => `#${Number(t) + 1}`,
     status() {
       if (finished) {
         const ws = pits[6], bs = pits[13];

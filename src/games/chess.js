@@ -3,9 +3,9 @@ import { makeGridView, pieceHTML } from "./grid-view.js";
 
 export const meta = {
   id: "chess",
-  title: "Chess",
+  titleKey: "game.chess",
   glyph: "♞",
-  players: { w: "White", b: "Black" },
+  players: { w: "player.white", b: "player.black" },
   rotatable: true,
   moveRe: /^[a-h][1-8][a-h][1-8][qrbn]?$/,
 };
@@ -52,12 +52,12 @@ export function createEngine(tokens = []) {
       return token;
     },
     status() {
-      if (game.isCheckmate()) return { result: "win", winner: game.turn() === "w" ? "b" : "w", note: "Checkmate" };
-      if (game.isStalemate()) return { result: "draw", note: "Stalemate" };
-      if (game.isThreefoldRepetition()) return { result: "draw", note: "Threefold repetition" };
-      if (game.isInsufficientMaterial()) return { result: "draw", note: "Insufficient material" };
-      if (game.isDraw()) return { result: "draw", note: "Fifty-move rule" };
-      if (game.isCheck()) return { result: "active", note: "Check!" };
+      if (game.isCheckmate()) return { result: "win", winner: game.turn() === "w" ? "b" : "w", note: { k: "note.checkmate" } };
+      if (game.isStalemate()) return { result: "draw", note: { k: "note.stalemate" } };
+      if (game.isThreefoldRepetition()) return { result: "draw", note: { k: "note.threefold" } };
+      if (game.isInsufficientMaterial()) return { result: "draw", note: { k: "note.insufficient" } };
+      if (game.isDraw()) return { result: "draw", note: { k: "note.fiftyMove" } };
+      if (game.isCheck()) return { result: "active", note: { k: "note.check" } };
       return { result: "active" };
     },
   };
@@ -108,10 +108,10 @@ export function tapReducer(engine, selection, cellId) {
         return {
           kind: "choose",
           options: [
-            { value: "q", label: "Queen", glyph: "♛" },
-            { value: "r", label: "Rook", glyph: "♜" },
-            { value: "b", label: "Bishop", glyph: "♝" },
-            { value: "n", label: "Knight", glyph: "♞" },
+            { value: "q", labelKey: "promo.queen", glyph: "♛" },
+            { value: "r", labelKey: "promo.rook", glyph: "♜" },
+            { value: "b", labelKey: "promo.bishop", glyph: "♝" },
+            { value: "n", labelKey: "promo.knight", glyph: "♞" },
           ],
           build: (v) => selection.from + cellId + v,
         };

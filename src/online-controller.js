@@ -13,6 +13,7 @@ import {
   extendsHistory,
 } from "./link-codec.js";
 import { announce } from "./ui.js";
+import { t } from "./i18n.js";
 
 export class OnlineController {
   constructor(gameController, { transport, onLinkReady, onIncomingApplied, onRelayStatus }) {
@@ -42,7 +43,7 @@ export class OnlineController {
     this.gc.newGame(state.gameType, state.gameId);
     this._persist();
     this._startRelaySync();
-    announce("New game started. You move first — then send the link.");
+    announce(t("msg.newGameStarted"));
   }
 
   afterLocalMove(record) {
@@ -79,7 +80,7 @@ export class OnlineController {
       action: this.pendingAction,
     });
     this.onRelayStatus(ok ? "synced" : "offline");
-    if (!ok) announce("Relays unreachable — send the link instead.");
+    if (!ok) announce(t("msg.relaysUnreachable"));
   }
 
   async _startRelaySync() {
@@ -107,7 +108,7 @@ export class OnlineController {
     if (!this.opponentPubkey) {
       this.opponentPubkey = pubkey;
       this._persist();
-      if (!isNews) announce("Opponent joined — relay sync active.");
+      if (!isNews) announce(t("msg.opponentJoined"));
     }
     if (!isNews) return;
     const applied = this._applyState({ moves: incoming, action: payload.action || null });
@@ -120,14 +121,14 @@ export class OnlineController {
     setState({ phase: "finished", status: { result: "resignation", winner } });
     this._persist();
     this._broadcast();
-    announce("You resigned.");
+    announce(t("msg.youResigned"));
   }
 
   offerDraw() {
     this.pendingAction = "do";
     this._persist();
     this._broadcast();
-    announce("Draw offer sent.");
+    announce(t("msg.drawSent"));
   }
 
   acceptDraw() {
@@ -135,30 +136,30 @@ export class OnlineController {
     setState({ phase: "finished", status: { result: "draw-agreement", winner: null }, pendingDrawOffer: false });
     this._persist();
     this._broadcast();
-    announce("Draw agreed.");
+    announce(t("msg.drawAgreed"));
   }
 
   declineDraw() {
     setState({ pendingDrawOffer: false });
-    announce("Draw offer declined. Make your move.");
+    announce(t("msg.drawDeclined"));
   }
 
   handleIncoming(hash, stored) {
     const parsed = parseHash(hash);
     if (!parsed) return false;
     if (!parsed.ok) {
-      announce("That game link is invalid.");
+      announce(t("msg.linkInvalid"));
       return false;
     }
 
     const known = stored && stored.mode === "online" && stored.gameId === parsed.gameId ? stored : null;
 
     if (known && !extendsHistory(known.linkMoves || [], parsed.moves)) {
-      announce("This link does not match your game history — it may be old or altered. Ignoring it.");
+      announce(t("msg.linkMismatch"));
       return false;
     }
     if (!known && state.mode === "online" && state.phase === "active" && state.gameId && state.gameId !== parsed.gameId) {
-      const ok = window.confirm("This link is for a different game. Open it and leave your current game?");
+      const ok = window.confirm(t("confirm.otherGame"));
       if (!ok) return false;
     }
 
@@ -168,7 +169,7 @@ export class OnlineController {
     } else {
       const probe = replayMoves(parsed.gameType, parsed.moves, parsed.gameId);
       if (!probe.ok) {
-        announce("That game link contains an illegal move. Ignoring it.");
+        announce(t("msg.linkIllegal"));
         return false;
       }
       localColor = parsed.moves.length === 0 ? "black" : probe.engine.turn() === "w" ? "white" : "black";
@@ -202,7 +203,7 @@ export class OnlineController {
   _applyState({ moves, action }, fresh = false) {
     const replay = replayMoves(state.gameType, moves, state.gameId);
     if (!replay.ok) {
-      announce("Received an illegal game state. Ignoring it.");
+      announce(t("msg.stateIllegal"));
       return false;
     }
     this.moves = moves.slice();
@@ -216,16 +217,16 @@ export class OnlineController {
     const localColor = state.localColor;
     if (action === "res") {
       setState({ phase: "finished", status: { result: "resignation", winner: localColor } });
-      announce("Your opponent resigned. You win.");
+      announce(t("msg.oppResigned"));
     } else if (action === "da") {
       setState({ phase: "finished", status: { result: "draw-agreement", winner: null } });
-      announce("Your opponent accepted the draw.");
+      announce(t("msg.oppAcceptedDraw"));
     } else if (action === "do") {
       setState({ pendingDrawOffer: true });
-      announce("Your opponent offers a draw. Accept, or just make your move to decline.");
+      announce(t("msg.oppOffersDraw"));
     } else {
       const myTurn = (replay.engine.turn() === "w" ? "white" : "black") === localColor;
-      announce(myTurn ? "Move received — your turn." : "Game loaded. Waiting for your opponent.");
+      announce(myTurn ? t("msg.moveReceived") : t("msg.gameLoaded"));
     }
     this._persist();
     return true;

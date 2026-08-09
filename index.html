@@ -21,11 +21,12 @@
 <div id="app">
   <header class="app-header">
     <h1 class="logo">CHECK<span>MATE</span></h1>
+    <select id="lang-select" class="lang-select" data-i18n-aria="lang.label"></select>
   </header>
 
   <nav class="mode-switch" role="group" aria-label="Game mode">
-    <button type="button" class="mode-btn" data-mode="hotseat" aria-pressed="true">Hotseat</button>
-    <button type="button" class="mode-btn" data-mode="online" aria-pressed="false">Online</button>
+    <button type="button" class="mode-btn" data-mode="hotseat" data-i18n="mode.hotseat">Hotseat</button>
+    <button type="button" class="mode-btn" data-mode="online" data-i18n="mode.online">Online</button>
   </nav>
 
   <div id="status-bar" class="status-bar" role="status"></div>
@@ -33,16 +34,16 @@
   <main id="main-area" class="main-area">
     <section id="board-section" class="board-section">
       <div id="board-wrap" class="board-wrap">
-        <div id="board" class="board" role="grid" aria-label="Chess board"></div>
+        <div id="board" class="board" role="grid" aria-label="Game board"></div>
         <div id="handoff-screen" class="handoff-screen hidden">
           <p id="handoff-text"></p>
-          <button type="button" id="handoff-ready-btn" class="btn btn-primary">Tap when ready</button>
+          <button type="button" id="handoff-ready-btn" class="btn btn-primary" data-i18n="btn.tapWhenReady">Tap when ready</button>
         </div>
-        <div id="promotion-modal" class="promotion-modal hidden" role="dialog" aria-modal="true" aria-label="Choose promotion piece">
+        <div id="promotion-modal" class="promotion-modal hidden" role="dialog" aria-modal="true" data-i18n-aria="panel.choose">
           <div class="promotion-sheet">
-            <h2>Choose</h2>
+            <h2 data-i18n="panel.choose">Choose</h2>
             <div class="promotion-choices"></div>
-            <button type="button" class="btn" id="promotion-cancel-btn">Cancel</button>
+            <button type="button" class="btn" id="promotion-cancel-btn" data-i18n="btn.cancel">Cancel</button>
           </div>
         </div>
       </div>
@@ -51,23 +52,23 @@
 
       <!-- Send-move panel: appears in online mode after your move -->
       <div id="send-panel" class="send-panel hidden">
-        <h3 class="step-label">Send your move</h3>
+        <h3 class="step-label" data-i18n="panel.sendMove">Send your move</h3>
         <div class="btn-row">
-          <button type="button" id="share-link-btn" class="btn btn-primary">Share</button>
-          <button type="button" id="copy-link-btn" class="btn">Copy Link</button>
-          <button type="button" id="qr-link-btn" class="btn">QR</button>
+          <button type="button" id="share-link-btn" class="btn btn-primary" data-i18n="btn.share">Share</button>
+          <button type="button" id="copy-link-btn" class="btn" data-i18n="btn.copyLink">Copy Link</button>
+          <button type="button" id="qr-link-btn" class="btn" data-i18n="btn.qr">QR</button>
         </div>
         <canvas id="link-qr" class="qr-canvas hidden"></canvas>
         <textarea id="link-output" readonly rows="2" aria-label="Move link"></textarea>
       </div>
 
       <div id="game-controls" class="game-controls">
-        <button type="button" id="new-game-btn" class="btn">New Game</button>
-        <button type="button" id="rotate-btn" class="btn hotseat-only rotatable-only">Rotate</button>
-        <button type="button" id="undo-btn" class="btn hotseat-only">Undo</button>
-        <button type="button" id="resign-btn" class="btn">Resign</button>
-        <button type="button" id="draw-btn" class="btn hotseat-only">Draw</button>
-        <button type="button" id="offer-draw-btn" class="btn online-only">Offer Draw</button>
+        <button type="button" id="new-game-btn" class="btn" data-i18n="btn.newGame">New Game</button>
+        <button type="button" id="rotate-btn" class="btn hotseat-only rotatable-only" data-i18n="btn.rotate">Rotate</button>
+        <button type="button" id="undo-btn" class="btn hotseat-only" data-i18n="btn.undo">Undo</button>
+        <button type="button" id="resign-btn" class="btn" data-i18n="btn.resign">Resign</button>
+        <button type="button" id="draw-btn" class="btn hotseat-only" data-i18n="btn.draw">Draw</button>
+        <button type="button" id="offer-draw-btn" class="btn online-only" data-i18n="btn.offerDraw">Offer Draw</button>
       </div>
     </section>
 
@@ -76,35 +77,38 @@
         <div id="game-picker" class="game-picker" role="group" aria-label="Choose a game"></div>
 
         <div id="hotseat-setup" class="setup-block">
-          <p class="setup-hint">Two players, one device. Pass it back and forth. Works fully offline.</p>
-          <button type="button" id="start-hotseat-btn" class="btn btn-primary btn-lg">Start Game</button>
+          <p class="setup-hint" data-i18n="setup.hotseatHint"></p>
+          <button type="button" id="start-hotseat-btn" class="btn btn-primary btn-lg" data-i18n="setup.startGame">Start Game</button>
           <label class="toggle-row rotatable-only">
             <input type="checkbox" id="rotate-toggle" />
-            <span>Rotate board each turn</span>
+            <span data-i18n="setup.rotateToggle">Rotate board each turn</span>
           </label>
           <label class="toggle-row">
             <input type="checkbox" id="handoff-toggle" />
-            <span>Show handoff screen</span>
+            <span data-i18n="setup.handoffToggle">Show handoff screen</span>
           </label>
         </div>
 
         <div id="online-setup" class="setup-block">
-          <p class="setup-hint">Play by link — no accounts, no server. After a one-time invite link, moves sync automatically through public relays; the link stays available as a fallback for any game, any time.</p>
-          <button type="button" id="start-online-btn" class="btn btn-primary btn-lg">New Game<span class="btn-sub">You play White</span></button>
-          <p class="setup-hint dim">Received a link? Just open it — the game loads automatically.</p>
+          <p class="setup-hint" data-i18n="setup.onlineHint"></p>
+          <button type="button" id="start-online-btn" class="btn btn-primary btn-lg">
+            <span data-i18n="setup.newGame">New Game</span>
+            <span class="btn-sub" data-i18n="setup.youMoveFirst">You move first</span>
+          </button>
+          <p class="setup-hint dim" data-i18n="setup.receivedLink"></p>
         </div>
       </div>
 
       <div id="draw-offer-banner" class="draw-offer-banner hidden">
-        <span>Opponent offers a draw</span>
+        <span data-i18n="draw.offered">Opponent offers a draw</span>
         <div class="btn-row">
-          <button type="button" id="accept-draw-btn" class="btn btn-primary">Accept</button>
-          <button type="button" id="reject-draw-btn" class="btn">Decline</button>
+          <button type="button" id="accept-draw-btn" class="btn btn-primary" data-i18n="btn.accept">Accept</button>
+          <button type="button" id="reject-draw-btn" class="btn" data-i18n="btn.decline">Decline</button>
         </div>
       </div>
 
       <div id="move-history-panel" class="move-history-panel">
-        <h2>Moves</h2>
+        <h2 data-i18n="panel.moves">Moves</h2>
         <ol id="move-history-list"></ol>
       </div>
     </aside>

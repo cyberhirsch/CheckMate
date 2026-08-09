@@ -1,10 +1,11 @@
 import { pieceHTML } from "./grid-view.js";
+import { t } from "../i18n.js";
 
 export const meta = {
   id: "ur",
-  title: "Royal Game of Ur",
+  titleKey: "game.ur",
   glyph: "𒀭",
-  players: { w: "Sun", b: "Moon" },
+  players: { w: "player.sun", b: "player.moon" },
   rotatable: false,
   freeAspect: true,
   moveRe: /^(1[0-4]|[0-9]|x)$/,
@@ -126,13 +127,13 @@ export function createEngine(tokens = [], { gameId = "" } = {}) {
       const legal = movesForRoll(turnSide, currentRoll());
       return legal.length ? legal : ["x"];
     },
-    describe(t) {
-      return t === "x" ? "pass" : t === "0" ? "enter" : `from ${t}`;
+    describe(token) {
+      return token === "x" ? "–" : token === "0" ? "▸" : token;
     },
     status() {
-      if (pieces.w.every((p) => p === 15)) return { result: "win", winner: "w", note: "All pieces home" };
-      if (pieces.b.every((p) => p === 15)) return { result: "win", winner: "b", note: "All pieces home" };
-      return { result: "active", note: `Roll: ${currentRoll()}` };
+      if (pieces.w.every((p) => p === 15)) return { result: "win", winner: "w", note: { k: "note.allHome" } };
+      if (pieces.b.every((p) => p === 15)) return { result: "win", winner: "b", note: { k: "note.allHome" } };
+      return { result: "active", note: { k: "note.roll", p: { n: currentRoll() } } };
     },
   };
 
@@ -213,18 +214,18 @@ export function createView(container) {
       const homeCount = (side) => engine.pieces[side].filter((p) => p === 15).length;
       const canEnter = legal.has("0");
       const passOnly = legal.has("x");
-      poolTop.innerHTML =
-        `<span class="ur-pool-label">${meta.players.w}</span>` +
-        `<span class="ur-pool-pieces gpiece-w">${"●".repeat(poolCount("w"))}</span>` +
-        `<span class="ur-pool-home">home ${homeCount("w")}</span>` +
-        (engine.turn() === "w" && canEnter ? `<button type="button" class="btn ur-enter" data-act="enter">Enter piece</button>` : "") +
-        (engine.turn() === "w" && passOnly ? `<button type="button" class="btn ur-enter" data-act="pass">Pass (no moves)</button>` : "");
-      poolBottom.innerHTML =
-        `<span class="ur-pool-label">${meta.players.b}</span>` +
-        `<span class="ur-pool-pieces gpiece-b">${"●".repeat(poolCount("b"))}</span>` +
-        `<span class="ur-pool-home">home ${homeCount("b")}</span>` +
-        (engine.turn() === "b" && canEnter ? `<button type="button" class="btn ur-enter" data-act="enter">Enter piece</button>` : "") +
-        (engine.turn() === "b" && passOnly ? `<button type="button" class="btn ur-enter" data-act="pass">Pass (no moves)</button>` : "");
+      const poolHTML = (side) =>
+        `<span class="ur-pool-label">${t(meta.players[side])}</span>` +
+        `<span class="ur-pool-pieces gpiece-${side}">${"●".repeat(poolCount(side))}</span>` +
+        `<span class="ur-pool-home">${t("ur.home")} ${homeCount(side)}</span>` +
+        (engine.turn() === side && canEnter
+          ? `<button type="button" class="btn ur-enter" data-act="enter">${t("ur.enterPiece")}</button>`
+          : "") +
+        (engine.turn() === side && passOnly
+          ? `<button type="button" class="btn ur-enter" data-act="pass">${t("ur.pass")}</button>`
+          : "");
+      poolTop.innerHTML = poolHTML("w");
+      poolBottom.innerHTML = poolHTML("b");
       for (const pool of [poolTop, poolBottom]) {
         const btn = pool.querySelector(".ur-enter");
         if (btn) btn.addEventListener("click", () => tapCb && tapCb(btn.dataset.act));

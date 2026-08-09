@@ -2,9 +2,9 @@ import { pieceHTML } from "./grid-view.js";
 
 export const meta = {
   id: "dots",
-  title: "Dots & Boxes",
+  titleKey: "game.dots",
   glyph: "⊞",
-  players: { w: "Blue", b: "Orange" },
+  players: { w: "player.blue", b: "player.orange" },
   rotatable: false,
   moveRe: /^[hv][0-5],[0-5]$/,
 };

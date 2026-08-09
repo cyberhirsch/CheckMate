@@ -10,8 +10,9 @@
   --text-color: #fff;
   --dim-text: #666;
   --dimmer-text: #888;
-  --font-main: "Inter", system-ui, sans-serif;
-  --font-ui: "Outfit", system-ui, sans-serif;
+  /* CJK fallbacks: Inter/Outfit carry Latin, Greek and Turkish but no Han glyphs. */
+  --font-main: "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  --font-ui: "Outfit", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
 }
@@ -102,9 +103,42 @@ button { -webkit-tap-highlight-color: transparent; }
 /* ---------- Header ---------- */
 
 .app-header {
+  position: relative;
   padding: 14px 14px calc(8px + var(--safe-top));
   text-align: center;
 }
+
+.lang-select {
+  position: absolute;
+  right: 12px;
+  top: calc(10px + var(--safe-top));
+  min-height: 32px;
+  padding: 4px 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-color);
+  color: var(--dim-text);
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+  cursor: pointer;
+  appearance: none;
+  text-align: center;
+}
+.lang-select:hover { color: var(--text-color); border-color: var(--border-hover); }
+.lang-select:focus-visible { outline: 1px solid var(--text-color); outline-offset: 2px; }
+.lang-select option { background: var(--bg-color); color: var(--text-color); }
+
+/* Chinese has no letter-spacing convention; the tracking we use for Latin
+   micro-labels looks broken in Han script, so it is dropped there. */
+html[lang^="zh"] .logo,
+html[lang^="zh"] .mode-btn,
+html[lang^="zh"] .status-bar,
+html[lang^="zh"] .btn,
+html[lang^="zh"] .step-label,
+html[lang^="zh"] .toggle-row,
+html[lang^="zh"] .game-name,
+html[lang^="zh"] .move-history-panel h2 { letter-spacing: 0.02rem; }
 .logo {
   margin: 0;
   font-family: var(--font-ui);

@@ -1,0 +1,932 @@
+// Translations for the whole app.
+//
+// A note on Romeika (`rom`): this is the Pontic Greek variety still spoken
+// around Trabzon/Of in north-east Türkiye. It is endangered, overwhelmingly
+// oral, and has no standardized written form; its speakers are literate in
+// Turkish, so it is written here in Turkish orthography rather than Greek
+// script, which is how speakers themselves write it when they write it at all.
+// These strings are a best effort and would benefit from a native speaker's
+// review — corrections are very welcome.
+
+export const LANGUAGES = [
+  { code: "en", label: "English" },
+  { code: "de", label: "Deutsch" },
+  { code: "tr", label: "Türkçe" },
+  { code: "rom", label: "Romeika" },
+  { code: "it", label: "Italiano" },
+  { code: "zh", label: "中文" },
+];
+
+// `htmlLang` is what goes on <html lang>. Romeika's ISO 639-3 code is `pnt`
+// (Pontic Greek); we tag it with the Latin script subtag since we write it in
+// Turkish orthography.
+const HTML_LANG = { en: "en", de: "de", tr: "tr", rom: "pnt-Latn", it: "it", zh: "zh-Hans" };
+
+const STRINGS = {
+  en: {
+    "mode.hotseat": "Hotseat",
+    "mode.online": "Online",
+    "lang.label": "Language",
+
+    "setup.choose": "Choose a game and a mode.",
+    "setup.hotseatHint": "Two players, one device. Pass it back and forth. Works fully offline.",
+    "setup.onlineHint":
+      "Play by link — no accounts, no server. After a one-time invite link, moves sync automatically through public relays; the link stays available as a fallback for any game, any time.",
+    "setup.startGame": "Start Game",
+    "setup.newGame": "New Game",
+    "setup.youMoveFirst": "You move first",
+    "setup.receivedLink": "Received a link? Just open it — the game loads automatically.",
+    "setup.rotateToggle": "Rotate board each turn",
+    "setup.handoffToggle": "Show handoff screen",
+
+    "btn.newGame": "New Game",
+    "btn.rotate": "Rotate",
+    "btn.undo": "Undo",
+    "btn.resign": "Resign",
+    "btn.draw": "Draw",
+    "btn.offerDraw": "Offer Draw",
+    "btn.share": "Share",
+    "btn.copyLink": "Copy Link",
+    "btn.qr": "QR",
+    "btn.accept": "Accept",
+    "btn.decline": "Decline",
+    "btn.cancel": "Cancel",
+    "btn.tapWhenReady": "Tap when ready",
+
+    "panel.sendMove": "Send your move",
+    "panel.moves": "Moves",
+    "panel.choose": "Choose",
+    "draw.offered": "Opponent offers a draw",
+    "handoff.pass": "Pass the device to {name}",
+
+    "status.turn": "{name} to move",
+    "status.yourMove": "Your move ({name})",
+    "status.waiting": "Waiting for opponent",
+    "status.wins": "{name} wins",
+    "status.draw": "Draw",
+    "status.winsResign": "{name} wins by resignation",
+    "status.drawAgreed": "Game drawn by agreement",
+
+    "relay.listening": "Relay sync active — moves arrive automatically",
+    "relay.sending": "Sending move to relays…",
+    "relay.synced": "Move delivered via relay — link below is a backup",
+    "relay.offline": "Relays unreachable — send the link to your opponent",
+
+    "confirm.newGame": "Start a new game? Current progress will be lost.",
+    "confirm.resign": "Resign the current game?",
+    "confirm.otherGame": "This link is for a different game. Open it and leave your current game?",
+
+    "msg.invalidMove": "Invalid move",
+    "msg.played": "Played {move}",
+    "msg.undone": "Move undone",
+    "msg.copied": "Link copied",
+    "msg.copyBlocked": "Copy blocked — the link is selected, copy it manually",
+    "msg.qrFailed": "Could not render QR code — use Copy instead",
+    "msg.newGameStarted": "New game started. You move first — then send the link.",
+    "msg.linkInvalid": "That game link is invalid.",
+    "msg.linkMismatch": "This link does not match your game history — it may be old or altered. Ignoring it.",
+    "msg.linkIllegal": "That game link contains an illegal move. Ignoring it.",
+    "msg.stateIllegal": "Received an illegal game state. Ignoring it.",
+    "msg.opponentJoined": "Opponent joined — relay sync active.",
+    "msg.relaysUnreachable": "Relays unreachable — send the link instead.",
+    "msg.youResigned": "You resigned.",
+    "msg.drawSent": "Draw offer sent.",
+    "msg.drawAgreed": "Draw agreed.",
+    "msg.drawDeclined": "Draw offer declined. Make your move.",
+    "msg.oppResigned": "Your opponent resigned. You win.",
+    "msg.oppAcceptedDraw": "Your opponent accepted the draw.",
+    "msg.oppOffersDraw": "Your opponent offers a draw. Accept, or just make your move to decline.",
+    "msg.moveReceived": "Move received — your turn.",
+    "msg.gameLoaded": "Game loaded. Waiting for your opponent.",
+    "msg.restoredHotseat": "Restored your previous hotseat game",
+    "msg.restoredOnline": "Restored your online game",
+
+    "note.checkmate": "Checkmate",
+    "note.stalemate": "Stalemate",
+    "note.threefold": "Threefold repetition",
+    "note.insufficient": "Insufficient material",
+    "note.fiftyMove": "Fifty-move rule",
+    "note.check": "Check!",
+    "note.fourInRow": "Four in a row",
+    "note.threeInRow": "Three in a row",
+    "note.fiveInRow": "Five in a row",
+    "note.boardFull": "Board full",
+    "note.threeBoards": "Three boards in a row",
+    "note.mostBoards": "Most boards",
+    "note.equalBoards": "Equal boards",
+    "note.topBottom": "Top and bottom connected",
+    "note.leftRight": "Left and right connected",
+    "note.lastRank": "Reached the last rank",
+    "note.allCaptured": "All pieces captured",
+    "note.noMoves": "No moves",
+    "note.fewerThanThree": "Fewer than three men",
+    "note.placing": "Placing ({n} left)",
+    "note.allHome": "All pieces home",
+    "note.roll": "Roll: {n}",
+
+    "promo.queen": "Queen",
+    "promo.rook": "Rook",
+    "promo.bishop": "Bishop",
+    "promo.knight": "Knight",
+
+    "ur.home": "home",
+    "ur.enterPiece": "Enter piece",
+    "ur.pass": "Pass (no moves)",
+
+    "game.chess": "Chess",
+    "game.c4": "Connect Four",
+    "game.ttt": "Tic-Tac-Toe",
+    "game.uttt": "Ultimate TTT",
+    "game.reversi": "Reversi",
+    "game.checkers": "Checkers",
+    "game.gomoku": "Gomoku",
+    "game.hex": "Hex",
+    "game.morris": "Nine Men's Morris",
+    "game.dots": "Dots & Boxes",
+    "game.mancala": "Mancala",
+    "game.breakthrough": "Breakthrough",
+    "game.ur": "Royal Game of Ur",
+
+    "player.white": "White",
+    "player.black": "Black",
+    "player.red": "Red",
+    "player.yellow": "Yellow",
+    "player.x": "X",
+    "player.o": "O",
+    "player.blue": "Blue",
+    "player.orange": "Orange",
+    "player.south": "South",
+    "player.north": "North",
+    "player.sun": "Sun",
+    "player.moon": "Moon",
+  },
+
+  de: {
+    "mode.hotseat": "Hotseat",
+    "mode.online": "Online",
+    "lang.label": "Sprache",
+
+    "setup.choose": "Wähle ein Spiel und einen Modus.",
+    "setup.hotseatHint": "Zwei Spieler, ein Gerät. Einfach weiterreichen. Funktioniert komplett offline.",
+    "setup.onlineHint":
+      "Spielen per Link — ohne Konto, ohne Server. Nach einem einmaligen Einladungslink werden Züge automatisch über öffentliche Relays übertragen; der Link bleibt jederzeit als Rückfallweg verfügbar.",
+    "setup.startGame": "Spiel starten",
+    "setup.newGame": "Neues Spiel",
+    "setup.youMoveFirst": "Du beginnst",
+    "setup.receivedLink": "Einen Link bekommen? Einfach öffnen — das Spiel lädt automatisch.",
+    "setup.rotateToggle": "Brett nach jedem Zug drehen",
+    "setup.handoffToggle": "Übergabebildschirm zeigen",
+
+    "btn.newGame": "Neues Spiel",
+    "btn.rotate": "Drehen",
+    "btn.undo": "Zurück",
+    "btn.resign": "Aufgeben",
+    "btn.draw": "Remis",
+    "btn.offerDraw": "Remis bieten",
+    "btn.share": "Teilen",
+    "btn.copyLink": "Link kopieren",
+    "btn.qr": "QR",
+    "btn.accept": "Annehmen",
+    "btn.decline": "Ablehnen",
+    "btn.cancel": "Abbrechen",
+    "btn.tapWhenReady": "Tippen, wenn bereit",
+
+    "panel.sendMove": "Zug senden",
+    "panel.moves": "Züge",
+    "panel.choose": "Auswählen",
+    "draw.offered": "Gegner bietet Remis an",
+    "handoff.pass": "Gerät an {name} weitergeben",
+
+    "status.turn": "{name} am Zug",
+    "status.yourMove": "Du bist dran ({name})",
+    "status.waiting": "Warte auf Gegner",
+    "status.wins": "{name} gewinnt",
+    "status.draw": "Remis",
+    "status.winsResign": "{name} gewinnt durch Aufgabe",
+    "status.drawAgreed": "Remis vereinbart",
+
+    "relay.listening": "Relay-Sync aktiv — Züge kommen automatisch an",
+    "relay.sending": "Sende Zug an Relays…",
+    "relay.synced": "Zug über Relay zugestellt — Link unten als Reserve",
+    "relay.offline": "Relays nicht erreichbar — sende den Link an deinen Gegner",
+
+    "confirm.newGame": "Neues Spiel starten? Der aktuelle Fortschritt geht verloren.",
+    "confirm.resign": "Aktuelles Spiel aufgeben?",
+    "confirm.otherGame": "Dieser Link gehört zu einem anderen Spiel. Öffnen und das aktuelle Spiel verlassen?",
+
+    "msg.invalidMove": "Ungültiger Zug",
+    "msg.played": "{move} gespielt",
+    "msg.undone": "Zug zurückgenommen",
+    "msg.copied": "Link kopiert",
+    "msg.copyBlocked": "Kopieren blockiert — der Link ist markiert, bitte manuell kopieren",
+    "msg.qrFailed": "QR-Code konnte nicht erzeugt werden — bitte Kopieren nutzen",
+    "msg.newGameStarted": "Neues Spiel gestartet. Du beginnst — danach den Link senden.",
+    "msg.linkInvalid": "Dieser Spiel-Link ist ungültig.",
+    "msg.linkMismatch": "Dieser Link passt nicht zu deinem Spielverlauf — er ist womöglich alt oder verändert. Wird ignoriert.",
+    "msg.linkIllegal": "Dieser Spiel-Link enthält einen unerlaubten Zug. Wird ignoriert.",
+    "msg.stateIllegal": "Unerlaubter Spielstand empfangen. Wird ignoriert.",
+    "msg.opponentJoined": "Gegner ist beigetreten — Relay-Sync aktiv.",
+    "msg.relaysUnreachable": "Relays nicht erreichbar — bitte den Link senden.",
+    "msg.youResigned": "Du hast aufgegeben.",
+    "msg.drawSent": "Remisangebot gesendet.",
+    "msg.drawAgreed": "Remis vereinbart.",
+    "msg.drawDeclined": "Remisangebot abgelehnt. Mach deinen Zug.",
+    "msg.oppResigned": "Dein Gegner hat aufgegeben. Du gewinnst.",
+    "msg.oppAcceptedDraw": "Dein Gegner hat das Remis angenommen.",
+    "msg.oppOffersDraw": "Dein Gegner bietet Remis an. Annehmen — oder einfach ziehen, um abzulehnen.",
+    "msg.moveReceived": "Zug empfangen — du bist dran.",
+    "msg.gameLoaded": "Spiel geladen. Warte auf deinen Gegner.",
+    "msg.restoredHotseat": "Dein vorheriges Hotseat-Spiel wurde wiederhergestellt",
+    "msg.restoredOnline": "Dein Online-Spiel wurde wiederhergestellt",
+
+    "note.checkmate": "Schachmatt",
+    "note.stalemate": "Patt",
+    "note.threefold": "Dreifache Stellungswiederholung",
+    "note.insufficient": "Ungenügendes Material",
+    "note.fiftyMove": "50-Züge-Regel",
+    "note.check": "Schach!",
+    "note.fourInRow": "Vier in einer Reihe",
+    "note.threeInRow": "Drei in einer Reihe",
+    "note.fiveInRow": "Fünf in einer Reihe",
+    "note.boardFull": "Brett voll",
+    "note.threeBoards": "Drei Felder in einer Reihe",
+    "note.mostBoards": "Meiste Felder",
+    "note.equalBoards": "Gleich viele Felder",
+    "note.topBottom": "Oben und unten verbunden",
+    "note.leftRight": "Links und rechts verbunden",
+    "note.lastRank": "Grundreihe erreicht",
+    "note.allCaptured": "Alle Steine geschlagen",
+    "note.noMoves": "Keine Züge",
+    "note.fewerThanThree": "Weniger als drei Steine",
+    "note.placing": "Setzen (noch {n})",
+    "note.allHome": "Alle Steine im Ziel",
+    "note.roll": "Wurf: {n}",
+
+    "promo.queen": "Dame",
+    "promo.rook": "Turm",
+    "promo.bishop": "Läufer",
+    "promo.knight": "Springer",
+
+    "ur.home": "Ziel",
+    "ur.enterPiece": "Stein einsetzen",
+    "ur.pass": "Aussetzen (kein Zug)",
+
+    "game.chess": "Schach",
+    "game.c4": "Vier gewinnt",
+    "game.ttt": "Tic-Tac-Toe",
+    "game.uttt": "Ultimate TTT",
+    "game.reversi": "Reversi",
+    "game.checkers": "Dame",
+    "game.gomoku": "Gomoku",
+    "game.hex": "Hex",
+    "game.morris": "Mühle",
+    "game.dots": "Käsekästchen",
+    "game.mancala": "Mancala",
+    "game.breakthrough": "Breakthrough",
+    "game.ur": "Königliches Spiel von Ur",
+
+    "player.white": "Weiß",
+    "player.black": "Schwarz",
+    "player.red": "Rot",
+    "player.yellow": "Gelb",
+    "player.x": "X",
+    "player.o": "O",
+    "player.blue": "Blau",
+    "player.orange": "Orange",
+    "player.south": "Süd",
+    "player.north": "Nord",
+    "player.sun": "Sonne",
+    "player.moon": "Mond",
+  },
+
+  tr: {
+    "mode.hotseat": "Aynı Cihaz",
+    "mode.online": "Çevrimiçi",
+    "lang.label": "Dil",
+
+    "setup.choose": "Bir oyun ve bir mod seç.",
+    "setup.hotseatHint": "İki oyuncu, tek cihaz. Sırayla uzatın. Tamamen çevrimdışı çalışır.",
+    "setup.onlineHint":
+      "Bağlantıyla oyna — hesap yok, sunucu yok. Tek seferlik davet bağlantısından sonra hamleler herkese açık aktarıcılar üzerinden otomatik eşitlenir; bağlantı her zaman yedek olarak kalır.",
+    "setup.startGame": "Oyunu Başlat",
+    "setup.newGame": "Yeni Oyun",
+    "setup.youMoveFirst": "İlk hamle senin",
+    "setup.receivedLink": "Bağlantı mı geldi? Aç yeter — oyun kendiliğinden yüklenir.",
+    "setup.rotateToggle": "Her hamlede tahtayı çevir",
+    "setup.handoffToggle": "Devir ekranını göster",
+
+    "btn.newGame": "Yeni Oyun",
+    "btn.rotate": "Çevir",
+    "btn.undo": "Geri Al",
+    "btn.resign": "Terk Et",
+    "btn.draw": "Beraberlik",
+    "btn.offerDraw": "Beraberlik Öner",
+    "btn.share": "Paylaş",
+    "btn.copyLink": "Bağlantıyı Kopyala",
+    "btn.qr": "QR",
+    "btn.accept": "Kabul Et",
+    "btn.decline": "Reddet",
+    "btn.cancel": "İptal",
+    "btn.tapWhenReady": "Hazırsan dokun",
+
+    "panel.sendMove": "Hamleni gönder",
+    "panel.moves": "Hamleler",
+    "panel.choose": "Seç",
+    "draw.offered": "Rakip beraberlik öneriyor",
+    "handoff.pass": "Cihazı {name} oyuncusuna ver",
+
+    "status.turn": "Sıra {name} oyuncusunda",
+    "status.yourMove": "Sıra sende ({name})",
+    "status.waiting": "Rakip bekleniyor",
+    "status.wins": "{name} kazandı",
+    "status.draw": "Beraberlik",
+    "status.winsResign": "{name} terk nedeniyle kazandı",
+    "status.drawAgreed": "Anlaşmayla beraberlik",
+
+    "relay.listening": "Aktarıcı eşitlemesi açık — hamleler otomatik gelir",
+    "relay.sending": "Hamle aktarıcılara gönderiliyor…",
+    "relay.synced": "Hamle aktarıcıyla iletildi — aşağıdaki bağlantı yedek",
+    "relay.offline": "Aktarıcılara ulaşılamıyor — bağlantıyı rakibine gönder",
+
+    "confirm.newGame": "Yeni oyun başlatılsın mı? Mevcut ilerleme kaybolacak.",
+    "confirm.resign": "Bu oyunu terk etmek istiyor musun?",
+    "confirm.otherGame": "Bu bağlantı başka bir oyuna ait. Açıp mevcut oyundan çıkılsın mı?",
+
+    "msg.invalidMove": "Geçersiz hamle",
+    "msg.played": "{move} oynandı",
+    "msg.undone": "Hamle geri alındı",
+    "msg.copied": "Bağlantı kopyalandı",
+    "msg.copyBlocked": "Kopyalama engellendi — bağlantı seçili, elle kopyala",
+    "msg.qrFailed": "QR kodu oluşturulamadı — Kopyala'yı kullan",
+    "msg.newGameStarted": "Yeni oyun başladı. İlk hamle senin — sonra bağlantıyı gönder.",
+    "msg.linkInvalid": "Bu oyun bağlantısı geçersiz.",
+    "msg.linkMismatch": "Bu bağlantı oyun geçmişinle uyuşmuyor — eski ya da değiştirilmiş olabilir. Yok sayılıyor.",
+    "msg.linkIllegal": "Bu oyun bağlantısı kuraldışı bir hamle içeriyor. Yok sayılıyor.",
+    "msg.stateIllegal": "Kuraldışı bir oyun durumu alındı. Yok sayılıyor.",
+    "msg.opponentJoined": "Rakip katıldı — aktarıcı eşitlemesi açık.",
+    "msg.relaysUnreachable": "Aktarıcılara ulaşılamıyor — bunun yerine bağlantıyı gönder.",
+    "msg.youResigned": "Oyunu terk ettin.",
+    "msg.drawSent": "Beraberlik önerisi gönderildi.",
+    "msg.drawAgreed": "Beraberlikte anlaşıldı.",
+    "msg.drawDeclined": "Beraberlik önerisi reddedildi. Hamleni yap.",
+    "msg.oppResigned": "Rakibin terk etti. Kazandın.",
+    "msg.oppAcceptedDraw": "Rakibin beraberliği kabul etti.",
+    "msg.oppOffersDraw": "Rakibin beraberlik öneriyor. Kabul et ya da hamleni yaparak reddet.",
+    "msg.moveReceived": "Hamle geldi — sıra sende.",
+    "msg.gameLoaded": "Oyun yüklendi. Rakibin bekleniyor.",
+    "msg.restoredHotseat": "Önceki aynı cihaz oyunun geri yüklendi",
+    "msg.restoredOnline": "Çevrimiçi oyunun geri yüklendi",
+
+    "note.checkmate": "Şah mat",
+    "note.stalemate": "Pat",
+    "note.threefold": "Üç kez tekrar",
+    "note.insufficient": "Yetersiz materyal",
+    "note.fiftyMove": "Elli hamle kuralı",
+    "note.check": "Şah!",
+    "note.fourInRow": "Yan yana dört",
+    "note.threeInRow": "Yan yana üç",
+    "note.fiveInRow": "Yan yana beş",
+    "note.boardFull": "Tahta doldu",
+    "note.threeBoards": "Sırayla üç tahta",
+    "note.mostBoards": "En çok tahta",
+    "note.equalBoards": "Eşit tahta",
+    "note.topBottom": "Üst ve alt birleşti",
+    "note.leftRight": "Sol ve sağ birleşti",
+    "note.lastRank": "Son sıraya ulaştı",
+    "note.allCaptured": "Bütün taşlar alındı",
+    "note.noMoves": "Hamle yok",
+    "note.fewerThanThree": "Üçten az taş",
+    "note.placing": "Yerleştirme ({n} kaldı)",
+    "note.allHome": "Bütün taşlar evde",
+    "note.roll": "Zar: {n}",
+
+    "promo.queen": "Vezir",
+    "promo.rook": "Kale",
+    "promo.bishop": "Fil",
+    "promo.knight": "At",
+
+    "ur.home": "ev",
+    "ur.enterPiece": "Taş sür",
+    "ur.pass": "Pas (hamle yok)",
+
+    "game.chess": "Satranç",
+    "game.c4": "Dört Yan Yana",
+    "game.ttt": "XOX",
+    "game.uttt": "Büyük XOX",
+    "game.reversi": "Reversi",
+    "game.checkers": "Dama",
+    "game.gomoku": "Gomoku",
+    "game.hex": "Hex",
+    "game.morris": "Dokuz Taş",
+    "game.dots": "Kutu Kapmaca",
+    "game.mancala": "Mangala",
+    "game.breakthrough": "Atılım",
+    "game.ur": "Ur Kraliyet Oyunu",
+
+    "player.white": "Beyaz",
+    "player.black": "Siyah",
+    "player.red": "Kırmızı",
+    "player.yellow": "Sarı",
+    "player.x": "X",
+    "player.o": "O",
+    "player.blue": "Mavi",
+    "player.orange": "Turuncu",
+    "player.south": "Güney",
+    "player.north": "Kuzey",
+    "player.sun": "Güneş",
+    "player.moon": "Ay",
+  },
+
+  // Romeika (Pontic Greek of Trabzon/Of), written in Turkish orthography.
+  // See the note at the top of this file — native-speaker review welcome.
+  rom: {
+    "mode.hotseat": "Ena Cihaz",
+    "mode.online": "Onlayn",
+    "lang.label": "Glosa",
+
+    "setup.choose": "Diale ena peğnid ke ena tropon.",
+    "setup.hotseatHint": "Dio peğnideri, ena cihaz. Dosnate to ena son alon. Dulevi ke horis internet.",
+    "setup.onlineHint":
+      "Peks me linki — çi eğ hesap, çi eğ server. Meta to proton linki, ta kinisis pane monaha me ta dimosia rele; to linki menni panda os efedrikon.",
+    "setup.startGame": "Arhis to peğnid",
+    "setup.newGame": "Neon peğnid",
+    "setup.youMoveFirst": "Esi paiz proton",
+    "setup.receivedLink": "Erthen linki? Anigson ato — to peğnid fortonete monaho.",
+    "setup.rotateToggle": "Girizon to tavli kathe fora",
+    "setup.handoffToggle": "Dikson tin othoni tis paradosis",
+
+    "btn.newGame": "Neon peğnid",
+    "btn.rotate": "Girizon",
+    "btn.undo": "Opis",
+    "btn.resign": "Paradidume",
+    "btn.draw": "Isopalia",
+    "btn.offerDraw": "Prosferon isopalia",
+    "btn.share": "Miraz",
+    "btn.copyLink": "Andigrafon to linki",
+    "btn.qr": "QR",
+    "btn.accept": "Dehume",
+    "btn.decline": "Arniume",
+    "btn.cancel": "Akiron",
+    "btn.tapWhenReady": "Pate atan ise etimos",
+
+    "panel.sendMove": "Steilon tin kinisi su",
+    "panel.moves": "Kinisis",
+    "panel.choose": "Diale",
+    "draw.offered": "O andipalos prosferi isopalia",
+    "handoff.pass": "Dos to cihaz ston {name}",
+
+    "status.turn": "Paiz o {name}",
+    "status.yourMove": "Sira su ({name})",
+    "status.waiting": "Karteri ton andipalon",
+    "status.wins": "Kerdiz o {name}",
+    "status.draw": "Isopalia",
+    "status.winsResign": "Kerdiz o {name}, o alos paradothen",
+    "status.drawAgreed": "Isopalia me simfonia",
+
+    "relay.listening": "Ta rele dulevne — ta kinisis erhode monaha",
+    "relay.sending": "Stelo tin kinisi sa rele…",
+    "relay.synced": "İ kinisi epien me to rele — to linki kato en efedrikon",
+    "relay.offline": "Ta rele çi anigode — steilon to linki ston andipalon",
+
+    "confirm.newGame": "Na arhinis neon peğnid? To torinon peğnid hanete.",
+    "confirm.resign": "Na paradothis so torinon peğnid?",
+    "confirm.otherGame": "Atto to linki en ğia alo peğnid. Na anigo ato ke na afino to torinon?",
+
+    "msg.invalidMove": "Kaki kinisi",
+    "msg.played": "Epaiksen {move}",
+    "msg.undone": "İ kinisi epien opis",
+    "msg.copied": "To linki andigrafthen",
+    "msg.copyBlocked": "İ andigrafi çi eğinen — to linki en dialeğmenon, andigrafson ato me to heri",
+    "msg.qrFailed": "To QR çi eğinen — hrisimopiison to andigrafon",
+    "msg.newGameStarted": "Neon peğnid arhinen. Esi paiz proton — meta steilon to linki.",
+    "msg.linkInvalid": "Atto to linki çi en kalon.",
+    "msg.linkMismatch": "Atto to linki çi tairiaz me to peğnid su — isos en paleon i alağmenon. Çi to perno.",
+    "msg.linkIllegal": "Atto to linki eği kinisi pu çi eperni. Çi to perno.",
+    "msg.stateIllegal": "Erthen katastasi pu çi eperni. Çi to perno.",
+    "msg.opponentJoined": "O andipalos erthen — ta rele dulevne.",
+    "msg.relaysUnreachable": "Ta rele çi anigode — steilon to linki.",
+    "msg.youResigned": "Eparadothes.",
+    "msg.drawSent": "İ prosfora tis isopalias epien.",
+    "msg.drawAgreed": "Esimfonisan isopalia.",
+    "msg.drawDeclined": "İ isopalia çi eğinen dekti. Kamne tin kinisi su.",
+    "msg.oppResigned": "O andipalos su eparadothen. Ekerdises.",
+    "msg.oppAcceptedDraw": "O andipalos su edehthen tin isopalia.",
+    "msg.oppOffersDraw": "O andipalos su prosferi isopalia. Dehume, i kamne tin kinisi su ğia na arnithis.",
+    "msg.moveReceived": "Erthen i kinisi — sira su.",
+    "msg.gameLoaded": "To peğnid fortothen. Karteri ton andipalon.",
+    "msg.restoredHotseat": "To palion peğnid so ena cihaz erthen opis",
+    "msg.restoredOnline": "To onlayn peğnid su erthen opis",
+
+    "note.checkmate": "Mat",
+    "note.stalemate": "Pat",
+    "note.threefold": "Tris fores to idion",
+    "note.insufficient": "Çi ftanne ta petsia",
+    "note.fiftyMove": "O nomos ton peninda kiniseon",
+    "note.check": "Sah!",
+    "note.fourInRow": "Tessera si sira",
+    "note.threeInRow": "Tria si sira",
+    "note.fiveInRow": "Pende si sira",
+    "note.boardFull": "To tavli eğemisen",
+    "note.threeBoards": "Tria tavlia si sira",
+    "note.mostBoards": "Ta perisotera tavlia",
+    "note.equalBoards": "İsa tavlia",
+    "note.topBottom": "Apano ke kato edethikan",
+    "note.leftRight": "Aristera ke deksia edethikan",
+    "note.lastRank": "Eftasen si stera sira",
+    "note.allCaptured": "Ola ta petsia eparthan",
+    "note.noMoves": "Çi eği kinisi",
+    "note.fewerThanThree": "Ligotera apo tria petsia",
+    "note.placing": "Vazi ({n} emine)",
+    "note.allHome": "Ola ta petsia so spit",
+    "note.roll": "Zari: {n}",
+
+    "promo.queen": "Vasilisa",
+    "promo.rook": "Pirgos",
+    "promo.bishop": "Aksiomatikos",
+    "promo.knight": "Alogon",
+
+    "ur.home": "spit",
+    "ur.enterPiece": "Vale petsi",
+    "ur.pass": "Pas (çi eği kinisi)",
+
+    "game.chess": "Skaki",
+    "game.c4": "Tessera si sira",
+    "game.ttt": "Triliza",
+    "game.uttt": "Meğali Triliza",
+    "game.reversi": "Reversi",
+    "game.checkers": "Dama",
+    "game.gomoku": "Gomoku",
+    "game.hex": "Heks",
+    "game.morris": "Enniara",
+    "game.dots": "Telies ke Kutia",
+    "game.mancala": "Mankala",
+    "game.breakthrough": "Diaspasi",
+    "game.ur": "To Vasilikon Peğnid tu Ur",
+
+    "player.white": "Aspron",
+    "player.black": "Mavron",
+    "player.red": "Kokinon",
+    "player.yellow": "Kitrinon",
+    "player.x": "X",
+    "player.o": "O",
+    "player.blue": "Galazion",
+    "player.orange": "Portokalin",
+    "player.south": "Noton",
+    "player.north": "Vorean",
+    "player.sun": "Ilion",
+    "player.moon": "Fengarin",
+  },
+
+  it: {
+    "mode.hotseat": "Stesso dispositivo",
+    "mode.online": "Online",
+    "lang.label": "Lingua",
+
+    "setup.choose": "Scegli un gioco e una modalità.",
+    "setup.hotseatHint": "Due giocatori, un dispositivo. Passatevelo a turno. Funziona anche offline.",
+    "setup.onlineHint":
+      "Gioca tramite link — niente account, niente server. Dopo un unico link d'invito le mosse si sincronizzano automaticamente tramite relay pubblici; il link resta sempre disponibile come alternativa.",
+    "setup.startGame": "Inizia partita",
+    "setup.newGame": "Nuova partita",
+    "setup.youMoveFirst": "Muovi per primo",
+    "setup.receivedLink": "Hai ricevuto un link? Aprilo — la partita si carica da sola.",
+    "setup.rotateToggle": "Ruota la scacchiera a ogni turno",
+    "setup.handoffToggle": "Mostra schermata di passaggio",
+
+    "btn.newGame": "Nuova partita",
+    "btn.rotate": "Ruota",
+    "btn.undo": "Annulla",
+    "btn.resign": "Abbandona",
+    "btn.draw": "Patta",
+    "btn.offerDraw": "Offri patta",
+    "btn.share": "Condividi",
+    "btn.copyLink": "Copia link",
+    "btn.qr": "QR",
+    "btn.accept": "Accetta",
+    "btn.decline": "Rifiuta",
+    "btn.cancel": "Annulla",
+    "btn.tapWhenReady": "Tocca quando sei pronto",
+
+    "panel.sendMove": "Invia la tua mossa",
+    "panel.moves": "Mosse",
+    "panel.choose": "Scegli",
+    "draw.offered": "L'avversario offre la patta",
+    "handoff.pass": "Passa il dispositivo a {name}",
+
+    "status.turn": "Tocca a {name}",
+    "status.yourMove": "Tocca a te ({name})",
+    "status.waiting": "In attesa dell'avversario",
+    "status.wins": "{name} vince",
+    "status.draw": "Patta",
+    "status.winsResign": "{name} vince per abbandono",
+    "status.drawAgreed": "Patta per accordo",
+
+    "relay.listening": "Sincronizzazione attiva — le mosse arrivano da sole",
+    "relay.sending": "Invio della mossa ai relay…",
+    "relay.synced": "Mossa consegnata via relay — il link sotto è di riserva",
+    "relay.offline": "Relay irraggiungibili — manda il link al tuo avversario",
+
+    "confirm.newGame": "Iniziare una nuova partita? I progressi attuali andranno persi.",
+    "confirm.resign": "Abbandonare la partita in corso?",
+    "confirm.otherGame": "Questo link è di un'altra partita. Aprirlo e lasciare quella attuale?",
+
+    "msg.invalidMove": "Mossa non valida",
+    "msg.played": "Giocato {move}",
+    "msg.undone": "Mossa annullata",
+    "msg.copied": "Link copiato",
+    "msg.copyBlocked": "Copia bloccata — il link è selezionato, copialo a mano",
+    "msg.qrFailed": "Impossibile generare il QR — usa Copia",
+    "msg.newGameStarted": "Nuova partita iniziata. Muovi per primo, poi manda il link.",
+    "msg.linkInvalid": "Questo link di partita non è valido.",
+    "msg.linkMismatch": "Questo link non corrisponde alla tua partita — potrebbe essere vecchio o alterato. Ignorato.",
+    "msg.linkIllegal": "Questo link contiene una mossa illegale. Ignorato.",
+    "msg.stateIllegal": "Ricevuto uno stato di gioco illegale. Ignorato.",
+    "msg.opponentJoined": "Avversario connesso — sincronizzazione attiva.",
+    "msg.relaysUnreachable": "Relay irraggiungibili — manda il link.",
+    "msg.youResigned": "Hai abbandonato.",
+    "msg.drawSent": "Offerta di patta inviata.",
+    "msg.drawAgreed": "Patta concordata.",
+    "msg.drawDeclined": "Offerta di patta rifiutata. Fai la tua mossa.",
+    "msg.oppResigned": "Il tuo avversario ha abbandonato. Hai vinto.",
+    "msg.oppAcceptedDraw": "Il tuo avversario ha accettato la patta.",
+    "msg.oppOffersDraw": "Il tuo avversario offre la patta. Accetta, oppure muovi per rifiutare.",
+    "msg.moveReceived": "Mossa ricevuta — tocca a te.",
+    "msg.gameLoaded": "Partita caricata. In attesa dell'avversario.",
+    "msg.restoredHotseat": "Ripristinata la partita precedente sullo stesso dispositivo",
+    "msg.restoredOnline": "Ripristinata la tua partita online",
+
+    "note.checkmate": "Scacco matto",
+    "note.stalemate": "Stallo",
+    "note.threefold": "Tripla ripetizione",
+    "note.insufficient": "Materiale insufficiente",
+    "note.fiftyMove": "Regola delle 50 mosse",
+    "note.check": "Scacco!",
+    "note.fourInRow": "Quattro in fila",
+    "note.threeInRow": "Tre in fila",
+    "note.fiveInRow": "Cinque in fila",
+    "note.boardFull": "Tabellone pieno",
+    "note.threeBoards": "Tre griglie in fila",
+    "note.mostBoards": "Più griglie",
+    "note.equalBoards": "Griglie pari",
+    "note.topBottom": "Alto e basso collegati",
+    "note.leftRight": "Sinistra e destra collegate",
+    "note.lastRank": "Raggiunta l'ultima traversa",
+    "note.allCaptured": "Tutti i pezzi catturati",
+    "note.noMoves": "Nessuna mossa",
+    "note.fewerThanThree": "Meno di tre pedine",
+    "note.placing": "Posizionamento ({n} rimaste)",
+    "note.allHome": "Tutte le pedine a casa",
+    "note.roll": "Tiro: {n}",
+
+    "promo.queen": "Donna",
+    "promo.rook": "Torre",
+    "promo.bishop": "Alfiere",
+    "promo.knight": "Cavallo",
+
+    "ur.home": "casa",
+    "ur.enterPiece": "Inserisci pedina",
+    "ur.pass": "Passa (nessuna mossa)",
+
+    "game.chess": "Scacchi",
+    "game.c4": "Forza 4",
+    "game.ttt": "Tris",
+    "game.uttt": "Tris Ultimate",
+    "game.reversi": "Reversi",
+    "game.checkers": "Dama",
+    "game.gomoku": "Gomoku",
+    "game.hex": "Hex",
+    "game.morris": "Mulino",
+    "game.dots": "Punti e quadrati",
+    "game.mancala": "Mancala",
+    "game.breakthrough": "Breakthrough",
+    "game.ur": "Gioco reale di Ur",
+
+    "player.white": "Bianco",
+    "player.black": "Nero",
+    "player.red": "Rosso",
+    "player.yellow": "Giallo",
+    "player.x": "X",
+    "player.o": "O",
+    "player.blue": "Blu",
+    "player.orange": "Arancione",
+    "player.south": "Sud",
+    "player.north": "Nord",
+    "player.sun": "Sole",
+    "player.moon": "Luna",
+  },
+
+  zh: {
+    "mode.hotseat": "同机对战",
+    "mode.online": "在线",
+    "lang.label": "语言",
+
+    "setup.choose": "请选择游戏和模式。",
+    "setup.hotseatHint": "两人共用一台设备，轮流传递。完全离线可用。",
+    "setup.onlineHint":
+      "用链接对战——无需账号，无需服务器。发送一次邀请链接后，棋步会通过公共中继自动同步；链接始终可作为备用方式。",
+    "setup.startGame": "开始游戏",
+    "setup.newGame": "新游戏",
+    "setup.youMoveFirst": "你先走",
+    "setup.receivedLink": "收到链接了？直接打开即可，游戏会自动载入。",
+    "setup.rotateToggle": "每回合旋转棋盘",
+    "setup.handoffToggle": "显示交接画面",
+
+    "btn.newGame": "新游戏",
+    "btn.rotate": "旋转",
+    "btn.undo": "悔棋",
+    "btn.resign": "认输",
+    "btn.draw": "和棋",
+    "btn.offerDraw": "提和",
+    "btn.share": "分享",
+    "btn.copyLink": "复制链接",
+    "btn.qr": "二维码",
+    "btn.accept": "接受",
+    "btn.decline": "拒绝",
+    "btn.cancel": "取消",
+    "btn.tapWhenReady": "准备好后点击",
+
+    "panel.sendMove": "发送你的棋步",
+    "panel.moves": "棋谱",
+    "panel.choose": "选择",
+    "draw.offered": "对手提议和棋",
+    "handoff.pass": "请把设备交给{name}",
+
+    "status.turn": "轮到{name}",
+    "status.yourMove": "轮到你了（{name}）",
+    "status.waiting": "等待对手",
+    "status.wins": "{name}获胜",
+    "status.draw": "和棋",
+    "status.winsResign": "对手认输，{name}获胜",
+    "status.drawAgreed": "双方同意和棋",
+
+    "relay.listening": "中继同步已开启——棋步会自动送达",
+    "relay.sending": "正在发送到中继…",
+    "relay.synced": "棋步已通过中继送达——下方链接为备用",
+    "relay.offline": "无法连接中继——请把链接发给对手",
+
+    "confirm.newGame": "开始新游戏？当前进度将丢失。",
+    "confirm.resign": "确定认输吗？",
+    "confirm.otherGame": "这个链接属于另一局游戏。打开它并离开当前游戏吗？",
+
+    "msg.invalidMove": "无效棋步",
+    "msg.played": "已走 {move}",
+    "msg.undone": "已悔棋",
+    "msg.copied": "链接已复制",
+    "msg.copyBlocked": "复制被阻止——链接已选中，请手动复制",
+    "msg.qrFailed": "无法生成二维码——请使用复制",
+    "msg.newGameStarted": "新游戏已开始。你先走，然后发送链接。",
+    "msg.linkInvalid": "该游戏链接无效。",
+    "msg.linkMismatch": "该链接与你的对局记录不符——可能是旧的或被改动过，已忽略。",
+    "msg.linkIllegal": "该链接包含非法棋步，已忽略。",
+    "msg.stateIllegal": "收到非法的对局状态，已忽略。",
+    "msg.opponentJoined": "对手已加入——中继同步已开启。",
+    "msg.relaysUnreachable": "无法连接中继——请改用链接发送。",
+    "msg.youResigned": "你已认输。",
+    "msg.drawSent": "已发送和棋提议。",
+    "msg.drawAgreed": "已达成和棋。",
+    "msg.drawDeclined": "和棋提议被拒绝。请走棋。",
+    "msg.oppResigned": "对手认输，你赢了。",
+    "msg.oppAcceptedDraw": "对手接受了和棋。",
+    "msg.oppOffersDraw": "对手提议和棋。可接受，或直接走棋表示拒绝。",
+    "msg.moveReceived": "收到棋步——轮到你了。",
+    "msg.gameLoaded": "对局已载入。等待对手。",
+    "msg.restoredHotseat": "已恢复上一局同机对战",
+    "msg.restoredOnline": "已恢复你的在线对局",
+
+    "note.checkmate": "将死",
+    "note.stalemate": "逼和",
+    "note.threefold": "三次重复局面",
+    "note.insufficient": "子力不足",
+    "note.fiftyMove": "五十步规则",
+    "note.check": "将军！",
+    "note.fourInRow": "四子连线",
+    "note.threeInRow": "三子连线",
+    "note.fiveInRow": "五子连线",
+    "note.boardFull": "棋盘已满",
+    "note.threeBoards": "三格连线",
+    "note.mostBoards": "占格最多",
+    "note.equalBoards": "占格相同",
+    "note.topBottom": "上下已连通",
+    "note.leftRight": "左右已连通",
+    "note.lastRank": "已抵达底线",
+    "note.allCaptured": "棋子已被全部吃掉",
+    "note.noMoves": "无棋可走",
+    "note.fewerThanThree": "少于三枚棋子",
+    "note.placing": "放子阶段（还剩{n}枚）",
+    "note.allHome": "所有棋子已到家",
+    "note.roll": "点数：{n}",
+
+    "promo.queen": "后",
+    "promo.rook": "车",
+    "promo.bishop": "象",
+    "promo.knight": "马",
+
+    "ur.home": "到家",
+    "ur.enterPiece": "放入棋子",
+    "ur.pass": "跳过（无棋可走）",
+
+    "game.chess": "国际象棋",
+    "game.c4": "四子棋",
+    "game.ttt": "井字棋",
+    "game.uttt": "终极井字棋",
+    "game.reversi": "黑白棋",
+    "game.checkers": "西洋跳棋",
+    "game.gomoku": "五子棋",
+    "game.hex": "六角棋",
+    "game.morris": "九子棋",
+    "game.dots": "点格棋",
+    "game.mancala": "播棋",
+    "game.breakthrough": "突围棋",
+    "game.ur": "乌尔王室局戏",
+
+    "player.white": "白方",
+    "player.black": "黑方",
+    "player.red": "红方",
+    "player.yellow": "黄方",
+    "player.x": "X",
+    "player.o": "O",
+    "player.blue": "蓝方",
+    "player.orange": "橙方",
+    "player.south": "南",
+    "player.north": "北",
+    "player.sun": "日",
+    "player.moon": "月",
+  },
+};
+
+const STORAGE_KEY = "checkmate:lang";
+let current = "en";
+const listeners = new Set();
+
+export function detectLanguage() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved && STRINGS[saved]) return saved;
+  } catch { /* storage unavailable */ }
+  const navLangs = navigator.languages || [navigator.language || "en"];
+  for (const raw of navLangs) {
+    const tag = String(raw).toLowerCase();
+    if (tag.startsWith("de")) return "de";
+    if (tag.startsWith("tr")) return "tr";
+    if (tag.startsWith("it")) return "it";
+    if (tag.startsWith("zh")) return "zh";
+    if (tag.startsWith("pnt")) return "rom";
+    if (tag.startsWith("en")) return "en";
+  }
+  return "en";
+}
+
+export function getLanguage() {
+  return current;
+}
+
+export function setLanguage(code) {
+  if (!STRINGS[code]) return;
+  current = code;
+  try {
+    localStorage.setItem(STORAGE_KEY, code);
+  } catch { /* ignore */ }
+  document.documentElement.lang = HTML_LANG[code] || code;
+  for (const fn of listeners) fn(code);
+}
+
+export function onLanguageChange(fn) {
+  listeners.add(fn);
+  return () => listeners.delete(fn);
+}
+
+// Translate a key, interpolating {placeholders}. Falls back to English, then
+// to the key itself so a missing string is visible rather than silently blank.
+export function t(key, params) {
+  const table = STRINGS[current] || STRINGS.en;
+  let str = table[key];
+  if (str === undefined) str = STRINGS.en[key];
+  if (str === undefined) return key;
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      str = str.replaceAll(`{${k}}`, String(v));
+    }
+  }
+  return str;
+}
+
+// Engine notes travel as either a plain string (scores like "3–3", already
+// language-neutral) or {k, p} which gets translated here.
+export function tNote(note) {
+  if (!note) return null;
+  if (typeof note === "string") return note;
+  return t(note.k, note.p);
+}
+
+// Applies translations to any element carrying data-i18n / data-i18n-* hooks.
+export function applyStaticTranslations(root = document) {
+  root.querySelectorAll("[data-i18n]").forEach((el) => {
+    el.textContent = t(el.dataset.i18n);
+  });
+  root.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+    el.placeholder = t(el.dataset.i18nPlaceholder);
+  });
+  root.querySelectorAll("[data-i18n-aria]").forEach((el) => {
+    el.setAttribute("aria-label", t(el.dataset.i18nAria));
+  });
+}

@@ -8,7 +8,8 @@ import { wireModeSwitch } from "./mode-controller.js";
 import { renderQR } from "./qr.js";
 import { loadStored, saveStored, clearStored } from "./storage.js";
 import { GAMES, GAME_ORDER, gameModule } from "./games/registry.js";
-import { el, announce, initReactiveUI, renderStatusBar, renderModeUI } from "./ui.js";
+import { el, announce, initReactiveUI, renderStatusBar, renderModeUI, renderAll } from "./ui.js";
+import { LANGUAGES, detectLanguage, setLanguage, getLanguage, t } from "./i18n.js";
 
 const boardHost = new BoardHost(el("board"), {
   onMoveToken: (token) => gameController.attemptToken(token),
@@ -34,13 +35,6 @@ const hotseat = new HotseatController(gameController);
 const transport = new NostrTransport();
 transport.init();
 
-const RELAY_STATUS_TEXT = {
-  listening: "Relay sync active — moves arrive automatically",
-  sending: "Sending move to relays…",
-  synced: "Move delivered via relay — link below is a backup",
-  offline: "Relays unreachable — send the link to your opponent",
-};
-
 const online = new OnlineController(gameController, {
   transport,
   onLinkReady: (link) => {
@@ -53,8 +47,9 @@ const online = new OnlineController(gameController, {
   },
   onRelayStatus: (status) => {
     const line = el("relay-status");
-    line.textContent = RELAY_STATUS_TEXT[status] || "";
+    line.textContent = status ? t("relay." + status) : "";
     line.dataset.state = status;
+    line.dataset.relayKey = status || "";
   },
 });
 
@@ -69,7 +64,7 @@ function buildGamePicker() {
     btn.className = "game-card";
     btn.dataset.game = id;
     btn.setAttribute("aria-pressed", String(id === state.gameType));
-    btn.innerHTML = `<span class="game-glyph">${meta.glyph}</span><span class="game-name">${meta.title}</span>`;
+    btn.innerHTML = `<span class="game-glyph">${meta.glyph}</span><span class="game-name">${t(meta.titleKey)}</span>`;
     btn.addEventListener("click", () => {
       if (state.gameType === id) return;
       setState({ gameType: id });
@@ -108,7 +103,7 @@ el("start-online-btn").addEventListener("click", () => {
 // --- Game controls ---
 el("new-game-btn").addEventListener("click", () => {
   if (state.phase === "active") {
-    const ok = window.confirm("Start a new game? Current progress will be lost.");
+    const ok = window.confirm(t("confirm.newGame"));
     if (!ok) return;
   }
   clearStored();
@@ -122,7 +117,7 @@ el("rotate-btn").addEventListener("click", () => hotseat.manualRotate());
 el("undo-btn").addEventListener("click", () => hotseat.undo());
 el("draw-btn").addEventListener("click", () => hotseat.endAsDraw());
 el("resign-btn").addEventListener("click", () => {
-  const ok = window.confirm("Resign the current game?");
+  const ok = window.confirm(t("confirm.resign"));
   if (!ok) return;
   if (state.mode === "hotseat") {
     hotseat.resignActiveColor();
@@ -141,13 +136,13 @@ el("reject-draw-btn").addEventListener("click", () => online.declineDraw());
 async function copyText(text) {
   try {
     await navigator.clipboard.writeText(text);
-    announce("Link copied");
+    announce(t("msg.copied"));
     return true;
   } catch {
     const ta = el("link-output");
     ta.focus();
     ta.select();
-    announce("Copy blocked — the link is selected, copy it manually");
+    announce(t("msg.copyBlocked"));
     return false;
   }
 }
@@ -174,7 +169,7 @@ el("qr-link-btn").addEventListener("click", async () => {
     return;
   }
   const ok = await renderQR(canvas, el("link-output").value);
-  if (!ok) announce("Could not render QR code — use Copy instead");
+  if (!ok) announce(t("msg.qrFailed"));
 });
 
 // --- Incoming links ---
@@ -218,15 +213,35 @@ function restore() {
       connectionState: "not-applicable",
     });
     gameController.loadEngine(stored.gameType || "chess", engine, stored.gameId);
-    announce("Restored your previous hotseat game");
+    announce(t("msg.restoredHotseat"));
   } else if (stored.mode === "online" && stored.linkMoves) {
     if (online.restore(stored)) {
-      announce("Restored your online game");
+      announce(t("msg.restoredOnline"));
     }
   }
 }
 
+function buildLanguagePicker() {
+  const sel = el("lang-select");
+  sel.innerHTML = "";
+  for (const lang of LANGUAGES) {
+    const opt = document.createElement("option");
+    opt.value = lang.code;
+    opt.textContent = lang.label;
+    sel.appendChild(opt);
+  }
+  sel.value = getLanguage();
+  sel.addEventListener("change", () => {
+    setLanguage(sel.value);
+    buildGamePicker();
+    // Re-render the active board so in-board labels (e.g. Ur's pool) follow.
+    if (gameController.engine) gameController.refreshInteractivity();
+  });
+}
+
 // --- Boot ---
+setLanguage(detectLanguage());
+buildLanguagePicker();
 buildGamePicker();
 initReactiveUI();
 el("rotate-toggle").checked = window.matchMedia("(max-width: 767px)").matches;

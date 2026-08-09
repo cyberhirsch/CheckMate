@@ -1,6 +1,7 @@
 import { gameModule } from "./games/registry.js";
 import { setState, state } from "./state.js";
 import { saveStored } from "./storage.js";
+import { t } from "./i18n.js";
 
 export class GameController {
   constructor({ boardHost, onAfterLocalMove, onGameOver, announce }) {
@@ -54,7 +55,7 @@ export class GameController {
     if (!this.engine) return false;
     const ok = this.engine.apply(token);
     if (!ok) {
-      this.announce("Invalid move");
+      this.announce(t("msg.invalidMove"));
       return false;
     }
     const label = this.engine.describe(token);
@@ -65,7 +66,7 @@ export class GameController {
     });
     this._syncBoard();
     this._persist();
-    this.announce(`Played ${label}`);
+    this.announce(t("msg.played", { move: label }));
     this._checkGameOver();
     this.onAfterLocalMove && this.onAfterLocalMove({ token, label });
     return true;
@@ -101,7 +102,7 @@ export class GameController {
     this.boardHost.setEngine(this.engine);
     this._syncBoard();
     this._persist();
-    this.announce("Move undone");
+    this.announce(t("msg.undone"));
   }
 
   resign(color) {

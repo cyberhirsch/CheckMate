@@ -2,9 +2,9 @@ import { pieceHTML } from "./grid-view.js";
 
 export const meta = {
   id: "hex",
-  title: "Hex",
+  titleKey: "game.hex",
   glyph: "⬡",
-  players: { w: "Red", b: "Blue" },
+  players: { w: "player.red", b: "player.blue" },
   rotatable: false,
   freeAspect: true,
   moveRe: /^[a-k](1[0-1]|[1-9])$/,
@@ -70,8 +70,8 @@ export function createEngine(tokens = []) {
     },
     describe: (t) => t,
     status() {
-      if (connected("w")) return { result: "win", winner: "w", note: "Top and bottom connected" };
-      if (connected("b")) return { result: "win", winner: "b", note: "Left and right connected" };
+      if (connected("w")) return { result: "win", winner: "w", note: { k: "note.topBottom" } };
+      if (connected("b")) return { result: "win", winner: "b", note: { k: "note.leftRight" } };
       return { result: "active" }; // hex can never draw
     },
   };

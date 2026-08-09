@@ -2,9 +2,9 @@ import { makeGridView, pieceHTML } from "./grid-view.js";
 
 export const meta = {
   id: "c4",
-  title: "Connect Four",
+  titleKey: "game.c4",
   glyph: "◍",
-  players: { w: "Red", b: "Yellow" },
+  players: { w: "player.red", b: "player.yellow" },
   rotatable: false,
   moveRe: /^[0-6]$/,
 };
@@ -50,11 +50,11 @@ export function createEngine(tokens = []) {
       for (let c = 0; c < COLS; c++) if (board[c].length < ROWS) out.push(String(c));
       return out;
     },
-    describe: (t) => `col ${Number(t) + 1}`,
+    describe: (t) => `#${Number(t) + 1}`,
     status() {
       const w = winner();
-      if (w) return { result: "win", winner: w, note: "Four in a row" };
-      if (board.every((c) => c.length >= ROWS)) return { result: "draw", note: "Board full" };
+      if (w) return { result: "win", winner: w, note: { k: "note.fourInRow" } };
+      if (board.every((c) => c.length >= ROWS)) return { result: "draw", note: { k: "note.boardFull" } };
       return { result: "active" };
     },
   };

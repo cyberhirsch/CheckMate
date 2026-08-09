@@ -84,6 +84,14 @@ https://<host>/<path>#t=<game>&g=<gameId>&m=<mv1-mv2-…>&a=<action>&p=<pubkey>
 - Published to 4 public relays (damus, nos.lol, nostr.band, snort); one acceptance counts as delivered.
 - Opponent seat claimed by the first pubkey publishing a valid extending state (same trust model as possessing the invite link); pinned thereafter.
 
+## 6a. Localization
+
+Six languages ship: English, German, Turkish, Romeika, Italian, Chinese (Simplified). All user-facing text is keyed — UI chrome, game titles, per-game player names (White/Black, Red/Yellow, Sun/Moon…), status lines, end-of-game notes, screen-reader announcements and `window.confirm` prompts. Engines return note **keys** (`{k, p}`) rather than English strings, so rules text is translated at render time; language-neutral values like scores pass through untouched.
+
+Language is auto-detected from `navigator.languages` on first visit, then persisted. `<html lang>` is updated so screen readers switch voice; Chinese drops the Latin micro-label letter-spacing, and the font stacks carry CJK fallbacks since Inter/Outfit have no Han glyphs.
+
+**Romeika** (`rom`, tagged `pnt-Latn`) is the Pontic Greek of Trabzon/Of — endangered, oral, with no standard orthography. It is written in **Turkish orthography**, matching how its speakers actually write it. These strings are a best effort pending native-speaker review; the file says so, and so does the README.
+
 ## 7. Design language
 
 Dark monochrome instrument panel (Typegrid system): pure black ground, `#050505–#111` surface ladder, `#222` hairline borders, sharp corners, no accent color — active states invert to white. Type: **Outfit** for controls and labels (uppercase, letter-spaced), **Inter** for prose, **JetBrains Mono** for links and move history. Grayscale board (`#8b8b8b` / `#3c3c3c`), solid glyphs colored per side. All touch targets ≥ 44px.
@@ -162,7 +170,8 @@ Hash commitment: publish `sha256(secret + salt)` up front, reveal at game end; c
 8. Board always oriented to the local player in online mode (rotatable games).
 9. Ur dice identical across independent engine instances given the same game ID and history.
 10. No horizontal scroll ≥ 320px width; touch-only interaction; choice dialogs thumb-reachable.
-11. Attribution: commits and published artifacts carry no AI authorship.
+11. Six languages complete (122 keys each, no gaps); switching relabels the live board without restarting a game.
+12. Attribution: commits and published artifacts carry no AI authorship.
 
 ## 10. Risks
 

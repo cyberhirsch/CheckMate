@@ -1,5 +1,6 @@
 import { state, subscribe } from "./state.js";
 import { gameModule } from "./games/registry.js";
+import { t, tNote, applyStaticTranslations, onLanguageChange } from "./i18n.js";
 
 const el = (id) => document.getElementById(id);
 const liveRegion = () => el("live-region");
@@ -12,27 +13,34 @@ export function announce(text) {
   });
 }
 
+// Player name for a shell colour ("white"/"black"), translated per game.
 function playerName(shellColor) {
   const mod = gameModule(state.gameType);
-  if (!mod) return shellColor === "white" ? "White" : "Black";
-  return mod.meta.players[shellColor === "white" ? "w" : "b"];
+  if (!mod) return t(shellColor === "white" ? "player.white" : "player.black");
+  return t(mod.meta.players[shellColor === "white" ? "w" : "b"]);
+}
+
+export function gameTitle(gameType) {
+  const mod = gameModule(gameType);
+  return mod ? t(mod.meta.titleKey) : gameType;
 }
 
 function statusText() {
   const s = state.status;
-  if (state.phase === "setup") return "Choose a game and a mode.";
-  const note = s.note ? ` — ${s.note}` : "";
-  if (s.result === "win") return `${playerName(s.winner)} wins${note}`;
-  if (s.result === "draw") return `Draw${note}`;
-  if (s.result === "resignation") return `${playerName(s.winner)} wins by resignation`;
-  if (s.result === "draw-agreement") return "Game drawn by agreement";
+  if (state.phase === "setup") return t("setup.choose");
+  const note = tNote(s.note);
+  const suffix = note ? ` — ${note}` : "";
+  if (s.result === "win") return t("status.wins", { name: playerName(s.winner) }) + suffix;
+  if (s.result === "draw") return t("status.draw") + suffix;
+  if (s.result === "resignation") return t("status.winsResign", { name: playerName(s.winner) });
+  if (s.result === "draw-agreement") return t("status.drawAgreed");
   const turnName = playerName(state.turn);
   if (state.mode === "online") {
     return state.turn === state.localColor
-      ? `Your move (${turnName})${note}`
-      : `Waiting for opponent${note}`;
+      ? t("status.yourMove", { name: turnName }) + suffix
+      : t("status.waiting") + suffix;
   }
-  return `${turnName} to move${note}`;
+  return t("status.turn", { name: turnName }) + suffix;
 }
 
 export function renderStatusBar() {
@@ -69,11 +77,11 @@ export function renderModeUI() {
   });
   document.querySelectorAll(".game-card").forEach((btn) => {
     btn.setAttribute("aria-pressed", String(btn.dataset.game === state.gameType));
+    const nameEl = btn.querySelector(".game-name");
+    if (nameEl) nameEl.textContent = gameTitle(btn.dataset.game);
   });
-  // rotation controls only make sense for rotatable games
   const mod = gameModule(state.gameType);
-  const rotatable = !!(mod && mod.meta.rotatable);
-  document.body.dataset.rotatable = rotatable ? "yes" : "no";
+  document.body.dataset.rotatable = mod && mod.meta.rotatable ? "yes" : "no";
 }
 
 export function renderDrawBanner() {
@@ -98,7 +106,8 @@ export function showChoices(options) {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "btn promo-btn";
-      btn.innerHTML = `<span class="promo-glyph">${opt.glyph || ""}</span>${opt.label}`;
+      const label = opt.labelKey ? t(opt.labelKey) : opt.label || "";
+      btn.innerHTML = `<span class="promo-glyph">${opt.glyph || ""}</span>${label}`;
       btn.addEventListener("click", () => {
         cleanup();
         resolve(opt.value);
@@ -113,7 +122,7 @@ export function showChoices(options) {
 
 export function showHandoffScreen(colorName, onReady) {
   const screen = el("handoff-screen");
-  el("handoff-text").textContent = `Pass the device to ${colorName}`;
+  el("handoff-text").textContent = t("handoff.pass", { name: colorName });
   screen.classList.remove("hidden");
   const btn = el("handoff-ready-btn");
   const handler = () => {
@@ -128,17 +137,18 @@ export function hideHandoffScreen() {
   el("handoff-screen").classList.add("hidden");
 }
 
-export function initReactiveUI() {
-  subscribe(() => {
-    renderStatusBar();
-    renderMoveHistory();
-    renderModeUI();
-    renderDrawBanner();
-  });
+export function renderAll() {
+  applyStaticTranslations();
   renderStatusBar();
   renderMoveHistory();
   renderModeUI();
   renderDrawBanner();
 }
 
-export { el, playerName };
+export function initReactiveUI() {
+  subscribe(renderAll);
+  onLanguageChange(renderAll);
+  renderAll();
+}
+
+export { el, playerName, t };

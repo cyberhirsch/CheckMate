@@ -2,9 +2,9 @@ import { pieceHTML } from "./grid-view.js";
 
 export const meta = {
   id: "morris",
-  title: "Nine Men's Morris",
+  titleKey: "game.morris",
   glyph: "◈",
-  players: { w: "White", b: "Black" },
+  players: { w: "player.white", b: "player.black" },
   rotatable: false,
   moveRe: /^(P(1\d|2[0-3]|\d)|M(1\d|2[0-3]|\d)-(1\d|2[0-3]|\d))(X(1\d|2[0-3]|\d))?$/,
 };
@@ -128,12 +128,15 @@ export function createEngine(tokens = []) {
     status() {
       const side = engine.turn();
       if (placed[side] >= 9 && menCount(side) < 3) {
-        return { result: "win", winner: side === "w" ? "b" : "w", note: "Fewer than three men" };
+        return { result: "win", winner: side === "w" ? "b" : "w", note: { k: "note.fewerThanThree" } };
       }
       if (expandMoves(side).length === 0) {
-        return { result: "win", winner: side === "w" ? "b" : "w", note: "No moves" };
+        return { result: "win", winner: side === "w" ? "b" : "w", note: { k: "note.noMoves" } };
       }
-      return { result: "active", note: phase(side) === "place" ? `Placing (${9 - placed[side]} left)` : undefined };
+      return {
+        result: "active",
+        note: phase(side) === "place" ? { k: "note.placing", p: { n: 9 - placed[side] } } : undefined,
+      };
     },
   };
 

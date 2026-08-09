@@ -2,9 +2,9 @@ import { makeGridView, pieceHTML } from "./grid-view.js";
 
 export const meta = {
   id: "ttt",
-  title: "Tic-Tac-Toe",
+  titleKey: "game.ttt",
   glyph: "◯",
-  players: { w: "X", b: "O" },
+  players: { w: "player.x", b: "player.o" },
   rotatable: false,
   moveRe: /^[0-8]$/,
 };
@@ -44,8 +44,8 @@ export function createEngine(tokens = []) {
     describe: (t) => "abc"[Number(t) % 3] + (3 - Math.floor(Number(t) / 3)),
     status() {
       const w = lineWinner(cells);
-      if (w) return { result: "win", winner: w, note: "Three in a row" };
-      if (cells.every(Boolean)) return { result: "draw", note: "Board full" };
+      if (w) return { result: "win", winner: w, note: { k: "note.threeInRow" } };
+      if (cells.every(Boolean)) return { result: "draw", note: { k: "note.boardFull" } };
       return { result: "active" };
     },
   };
