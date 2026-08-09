@@ -34,6 +34,18 @@ export BUBBLEWRAP_KEYSTORE_PASSWORD=... BUBBLEWRAP_KEY_PASSWORD=...
 Output: `app-release-signed.apk` (sideload/test) and `app-release-bundle.aab`
 (what Play Console wants).
 
+Two Windows quirks, both worked around in this setup: Bubblewrap's SDK check
+wants the *command-line tools* layout, so `~/.bubblewrap/android_sdk` holds
+its own mini-SDK (licenses pre-accepted in `licenses/`); and its apksigner
+invocation breaks on the space in `C:\Program Files`, so if `build` fails at
+signing, sign manually:
+
+```bash
+java -jar $ANDROID_HOME/build-tools/<ver>/lib/apksigner.jar sign   --ks checkmate.keystore --ks-key-alias checkmate   --ks-pass pass:<storepass> --key-pass pass:<keypass>   --out app-release-signed.apk app-release-unsigned-aligned.apk
+./gradlew.bat bundleRelease
+jarsigner -keystore checkmate.keystore -storepass <storepass>   -signedjar app-release-bundle.aab   app/build/outputs/bundle/release/app-release.aab checkmate
+```
+
 ## Digital Asset Links — the one manual step
 
 Without this, the app opens with a browser URL bar. The file must be served
